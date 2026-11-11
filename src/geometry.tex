@@ -1,0 +1,1130 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{konspekt}
+\renewcommand{\kheadleft}{Аналитическая геометрия и стереометрия}
+\hypersetup{pdftitle={Конспект теории: векторы, координаты, стереометрия},pdfauthor={Конспект теории}}
+
+\begin{document}
+
+% ===================== ОБЛОЖКА =====================
+\makecover{Аналитическая геометрия\\и стереометрия}
+{\begin{tikzpicture}[iso,scale=1.25]
+  % оси
+  \draw[axis] (0,0,0) -- (5.2,0,0) node[below left] {$x$};
+  \draw[axis] (0,0,0) -- (0,5.4,0) node[right] {$y$};
+  \draw[axis] (0,0,0) -- (0,0,4.6) node[above] {$z$};
+  % куб
+  \coordinate (A) at (0,0,0); \coordinate (B) at (3.6,0,0); \coordinate (C) at (3.6,3.6,0); \coordinate (D) at (0,3.6,0);
+  \coordinate (A1) at (0,0,3.6); \coordinate (B1) at (3.6,0,3.6); \coordinate (C1) at (3.6,3.6,3.6); \coordinate (D1) at (0,3.6,3.6);
+  \draw[klight,line width=0.7pt] (B) -- (C) -- (C1) -- (B1) -- cycle (A1) -- (B1) (C1) -- (D1) -- (A1) (D) -- (D1) (C) -- (D);
+  % тетраэдр
+  \fill[korange!25,opacity=0.9] (B) -- (D) -- (A1) -- cycle;
+  \fill[kviolet!18,opacity=0.85] (B) -- (D) -- (C1) -- cycle;
+  \draw[korange,line width=1.2pt] (B) -- (D) -- (A1) -- cycle;
+  \draw[kviolet,line width=1.2pt] (B) -- (C1) (D) -- (C1) (A1) -- (C1);
+  \foreach \p in {B,D,A1,C1} \fill (\p) circle (1.6pt);
+  % базис
+  \draw[vecv,line width=1.6pt] (0,0,0) -- (1.2,0,0) node[left,kviolet] {$\vec e_1$};
+  \draw[vecv,line width=1.6pt] (0,0,0) -- (0,1.2,0) node[below,kviolet] {$\vec e_2$};
+  \draw[vecv,line width=1.6pt] (0,0,0) -- (0,0,1.2) node[left,kviolet] {$\vec e_3$};
+  \node[below left] at (0,0,0) {$O$};
+  % вектор к точке
+  \draw[veco,line width=1.4pt] (0,0,0) -- (C1);
+  \node[above right,font=\normalsize] at (C1) {$M(x;y;z)$};
+  % сфера
+  \begin{scope}[shift={(0,7.2,1.3)}]
+    \shade[ball color=kviolet!35,opacity=0.9] (0,0,0) circle (1.25cm);
+    \draw[kviolet,line width=0.8pt] (0,0,0) circle (1.25cm);
+    \draw[kviolet,line width=0.6pt] (-1.25cm,0) arc (180:360:1.25cm and 0.38cm);
+    \draw[kviolet,line width=0.6pt,dashed] (1.25cm,0) arc (0:180:1.25cm and 0.38cm);
+    \fill (0,0,0) circle (1.4pt);
+    \draw[korange,line width=1pt] (0,0,0) -- (0.88cm,0.88cm) node[midway,above left,font=\small] {$R$};
+  \end{scope}
+\end{tikzpicture}}
+
+\maketoc
+
+% ===================== 1 =====================
+\section{Векторы}
+
+\subsection{Основные понятия}
+
+\begin{opr}
+\term{Вектор} — направленный отрезок. Обозначения: $\vec a$, $\ov{AB}$ ($A$ — начало, $B$ — конец).
+\end{opr}
+\begin{opr}
+\term{Нулевой вектор} $\vec 0$ — вектор, начало и конец которого совпадают.
+\end{opr}
+\begin{opr}
+\term{Длина (модуль)} вектора $|\vec a|$ — расстояние между его началом и концом.
+\end{opr}
+\begin{opr}
+Векторы называются \term{коллинеарными}, если они параллельны одной прямой. Коллинеарные векторы бывают
+\term{сонаправленными} ($\vec a\upuparrows\vec b$) и \term{противоположно направленными} ($\vec a\updownarrows\vec b$).
+\end{opr}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[vecv] (0,0.8) -- (2.4,1.25) node[above,kviolet] {$\vec a$};
+  \draw[veco] (0.5,0) -- (2.0,0.28) node[below right,korange] {$\vec b$};
+  \node at (1.3,-0.65) {$\vec a\upuparrows\vec b$};
+  \begin{scope}[xshift=5cm]
+  \draw[vecv] (0,0.8) -- (2.4,1.25) node[above,kviolet] {$\vec a$};
+  \draw[veco] (2.0,0.28) -- (0.5,0) node[below left,korange] {$\vec b$};
+  \node at (1.3,-0.65) {$\vec a\updownarrows\vec b$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Сонаправленные и противоположно направленные векторы}
+\end{figure}
+
+\begin{opr}
+Векторы $\vec a$ и $\vec b$ \term{равны}, если они сонаправлены и имеют равные длины:
+\[
+\vec a=\vec b\iff\begin{cases}\vec a\upuparrows\vec b,\\ |\vec a|=|\vec b|.\end{cases}
+\]
+\end{opr}
+\begin{opr}
+Векторы называются \term{компланарными}, если существует плоскость, которой они параллельны.
+\end{opr}
+
+\subsection{Линейные операции над векторами}
+\begin{enumerate}
+\item \textbf{Умножение вектора на число.} Если $\vec a=k\cdot\vec b$, то $\vec a$ и $\vec b$ коллинеарны;
+это \emph{условие коллинеарности} двух векторов.
+\item \textbf{Сложение (вычитание) векторов.}
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  % треугольник
+  \coordinate (A) at (0,0); \coordinate (B) at (2.2,0.3); \coordinate (C) at (2.9,1.8);
+  \draw[vecv] (A) -- (B) node[midway,below,kviolet] {$\vec a$};
+  \draw[vecv] (B) -- (C) node[midway,right,kviolet] {$\vec b$};
+  \draw[veco] (A) -- (C) node[midway,above left,korange] {$\vec c$};
+  \node[align=center,font=\footnotesize] at (1.5,-0.9) {Правило треугольника\\ $\vec c=\vec a+\vec b$};
+  % параллелограмм
+  \begin{scope}[xshift=4.6cm]
+  \coordinate (A) at (0,0); \coordinate (B) at (2.2,0.3); \coordinate (D) at (0.7,1.5); \coordinate (C) at (2.9,1.8);
+  \draw[aux] (B) -- (C) -- (D);
+  \draw[vecv] (A) -- (B) node[midway,below,kviolet] {$\vec a$};
+  \draw[vecv] (A) -- (D) node[midway,left,kviolet] {$\vec b$};
+  \draw[veco] (A) -- (C) node[pos=0.6,above left,korange] {$\vec c$};
+  \node[align=center,font=\footnotesize] at (1.5,-0.9) {Правило параллелограмма\\ $\vec c=\vec a+\vec b$};
+  \end{scope}
+  % многоугольник
+  \begin{scope}[xshift=9.4cm]
+  \coordinate (A) at (0,0); \coordinate (B) at (0.5,1.3); \coordinate (C) at (1.9,1.9); \coordinate (D) at (3.1,0.6);
+  \draw[vecv] (A) -- (B) node[midway,left,kviolet] {$\vec a$};
+  \draw[vecv] (B) -- (C) node[midway,above,kviolet] {$\vec b$};
+  \draw[vecv] (C) -- (D) node[midway,right,kviolet] {$\vec c$};
+  \draw[veco] (A) -- (D) node[midway,below,korange] {$\vec d$};
+  \node[align=center,font=\footnotesize] at (1.5,-0.9) {Правило многоугольника\\ $\vec d=\vec a+\vec b+\vec c$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Сложение векторов}
+\end{figure}
+
+\subsection{Линейная зависимость векторов}
+
+\begin{opr}
+Вектор $\vec b$ \term{раскладывается} по векторам $\vec a_1,\vec a_2,\dots,\vec a_n$, если он представим в виде их
+\term{линейной комбинации}:
+\[
+\exists\,\alpha_1,\alpha_2,\dots,\alpha_n:\quad \vec b=\alpha_1\vec a_1+\alpha_2\vec a_2+\dots+\alpha_n\vec a_n.
+\]
+Линейная комбинация называется \term{тривиальной}, если все $\alpha_i=0$.
+\end{opr}
+
+\begin{opr}
+Система векторов $\vec a_1,\dots,\vec a_k$ называется \term{линейно независимой} (ЛНЗ), если нулевой вектор раскладывается
+по ней единственным образом:
+\[
+\alpha_1\vec a_1+\alpha_2\vec a_2+\dots+\alpha_k\vec a_k=\vec 0\iff\alpha_i=0,\qquad i\in[1;k].
+\]
+Система называется \term{линейно зависимой} (ЛЗ), если нулевой вектор раскладывается по ней не единственным образом, т.\,е.
+\[
+\exists\,\alpha_1,\dots,\alpha_k:\quad\alpha_1\vec a_1+\dots+\alpha_k\vec a_k=\vec 0,\qquad\alpha_1^2+\alpha_2^2+\dots+\alpha_k^2\ne0.
+\]
+\end{opr}
+
+\begin{svv}[Свойства ЛНЗ и ЛЗ систем векторов]
+\begin{enumerate}
+\item Если среди векторов $\vec a_1,\dots,\vec a_k$ есть нулевой, то система ЛЗ.
+\item Система, содержащая один вектор, ЛЗ тогда и только тогда, когда этот вектор нулевой.
+\item Если к ЛЗ системе добавить другие векторы, то новая система будет ЛЗ.
+\item Любая часть (подсистема) ЛНЗ системы векторов — ЛНЗ.
+\end{enumerate}
+\end{svv}
+
+\begin{kob}{Теорема 1}
+Если вектор $\vec x$ раскладывается по системе векторов $\vec a_1,\dots,\vec a_k$, то это разложение единственно тогда
+и только тогда, когда система $\vec a_1,\dots,\vec a_k$ ЛНЗ.
+\end{kob}
+
+\begin{proof}
+($\Leftarrow$) Пусть $\vec x=\alpha_1\vec a_1+\dots+\alpha_k\vec a_k$ и система ЛНЗ. Предположим, что существует другой набор
+$(\beta_1,\dots,\beta_k)\ne(\alpha_1,\dots,\alpha_k)$, для которого $\vec x=\beta_1\vec a_1+\dots+\beta_k\vec a_k$. Вычтем:
+\[
+\vec 0=\vec x-\vec x=(\alpha_1-\beta_1)\vec a_1+(\alpha_2-\beta_2)\vec a_2+\dots+(\alpha_k-\beta_k)\vec a_k.
+\]
+Так как наборы различны, $(\alpha_1-\beta_1)^2+\dots+(\alpha_k-\beta_k)^2\ne0$, т.\,е. нулевой вектор разложен нетривиально,
+и система ЛЗ — противоречие. Значит, разложение единственно.
+
+($\Rightarrow$) Если бы система была ЛЗ, то $\vec 0=\gamma_1\vec a_1+\dots+\gamma_k\vec a_k$ с не всеми нулевыми $\gamma_i$, и
+$\vec x=(\alpha_1+\gamma_1)\vec a_1+\dots+(\alpha_k+\gamma_k)\vec a_k$ — второе разложение.
+\end{proof}
+
+\begin{kob}{Теорема 2}
+\begin{enumerate}
+\item Система из одного вектора ЛЗ $\iff$ это нулевой вектор.
+\item Система из двух векторов ЛЗ $\iff$ они коллинеарны.
+\item Система из трёх векторов ЛЗ $\iff$ они компланарны.
+\item Любые четыре вектора (в пространстве) ЛЗ; следовательно, любая система из $\geqslant4$ векторов ЛЗ.
+\end{enumerate}
+\end{kob}
+
+\subsection{Базис}
+
+\begin{opr}
+\term{Базисом} в векторном пространстве называют \emph{упорядоченную} ЛНЗ систему векторов, такую, что любой вектор
+этого пространства раскладывается по ней \emph{единственным} образом.
+\end{opr}
+
+\begin{enumerate}
+\item В нулевом пространстве базис не существует.
+\item В одномерном пространстве (на прямой) базис состоит из одного ненулевого вектора $\{\vec e_1\}$:
+$\forall\vec x\ \exists\,\alpha:\ \vec x=\alpha\vec e_1$.
+\item В двумерном пространстве (на плоскости) базис — упорядоченная пара неколлинеарных векторов $\{\vec e_1;\vec e_2\}$:
+$\forall\vec k\ \exists\,x,y:\ \vec k=x\vec e_1+y\vec e_2$.
+\item В трёхмерном пространстве базис — упорядоченная тройка некомпланарных векторов $\{\vec e_1;\vec e_2;\vec e_3\}$:
+$\forall\vec k\ \exists\,x,y,z:\ \vec k=x\vec e_1+y\vec e_2+z\vec e_3$. Пишут $\vec k(x;y;z)$.
+\end{enumerate}
+Числа $\alpha$, $x$, $y$, $z$ называются \term{координатами вектора} в данном базисе.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}[b]{0.3\linewidth}\centering
+\begin{tikzpicture}
+  \draw[thin aux] (-0.3,0) -- (3.3,0);
+  \draw[vecv] (0,0) -- (0.9,0) node[below,kviolet] {$\vec e_1$};
+  \draw[veco] (0,0.3) -- (2.8,0.3) node[above,korange] {$\vec x=\alpha\vec e_1$};
+\end{tikzpicture}\\[2mm]{\footnotesize прямая}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.3\linewidth}\centering
+\begin{tikzpicture}
+  \draw[vecv] (0,0) -- (1.1,0) node[below,kviolet] {$\vec e_1$};
+  \draw[vecv] (0,0) -- (0.5,0.9) node[left,kviolet] {$\vec e_2$};
+  \draw[aux] (2.2,0) -- (3.2,1.8) (1.0,1.8) -- (3.2,1.8);
+  \draw[veco] (0,0) -- (3.2,1.8) node[above,korange] {$\vec k$};
+\end{tikzpicture}\\[2mm]{\footnotesize плоскость}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.3\linewidth}\centering
+\begin{tikzpicture}[iso,scale=0.9]
+  \coordinate (K) at (2,2.4,1.8);
+  \draw[aux] (2,0,0) -- (2,2.4,0) -- (0,2.4,0) (2,2.4,0) -- (K);
+  \draw[vecv] (0,0,0) -- (1.1,0,0) node[left,kviolet] {$\vec e_1$};
+  \draw[vecv] (0,0,0) -- (0,1.1,0) node[below,kviolet] {$\vec e_2$};
+  \draw[vecv] (0,0,0) -- (0,0,1.1) node[left,kviolet] {$\vec e_3$};
+  \draw[veco] (0,0,0) -- (K) node[above,korange] {$\vec k$};
+\end{tikzpicture}\\[2mm]{\footnotesize пространство}
+\end{minipage}
+\caption{Базис на прямой, на плоскости и в пространстве}
+\end{figure}
+
+% ===================== 2 =====================
+\section{Матрицы и определители}
+
+\subsection{Матрицы}
+
+\begin{opr}
+\term{Матрица} $A_{m\times n}$ — таблица, состоящая из $m$ строк и $n$ столбцов и содержащая $m\cdot n$ чисел.
+\[
+A=\begin{pmatrix}
+a_{11}&a_{12}&\dots&a_{1n}\\
+a_{21}&a_{22}&\dots&a_{2n}\\
+\vdots&\vdots&\ddots&\vdots\\
+a_{m1}&a_{m2}&\dots&a_{mn}
+\end{pmatrix}
+\]
+\end{opr}
+
+\begin{enumerate}
+\item \textbf{Квадратная матрица} $A_{n\times n}$ — количество строк и столбцов совпадает. Элементы $a_{11},a_{22},\dots,a_{nn}$
+образуют \term{главную диагональ}.
+\item \textbf{Единичная матрица} $E$ — квадратная матрица, у которой все элементы главной диагонали равны $1$, а остальные равны $0$:
+\[
+E=\begin{pmatrix}
+1&0&\dots&0\\ 0&1&\dots&0\\ \vdots&\vdots&\ddots&\vdots\\ 0&0&\dots&1
+\end{pmatrix}.
+\]
+\item Матрица может быть \textbf{строкой} или \textbf{столбцом}. Например, вектор $\vec a(1;2;3)$ можно записать столбцом
+$\begin{pmatrix}1\\2\\3\end{pmatrix}$.
+\end{enumerate}
+
+\subsection{Транспонирование}
+
+\begin{opr}
+\term{Транспонирование} — замена строк матрицы её столбцами (с сохранением порядка). Обозначение: $A^T$.
+\[
+\begin{pmatrix}1&2&3\\4&5&6\\7&8&9\end{pmatrix}^{\!T}=\begin{pmatrix}1&4&7\\2&5&8\\3&6&9\end{pmatrix},\qquad
+\begin{pmatrix}a&b&c\\d&e&f\end{pmatrix}^{\!T}=\begin{pmatrix}a&d\\b&e\\c&f\end{pmatrix}.
+\]
+\end{opr}
+
+\subsection{Определитель квадратной матрицы}
+
+\begin{fbx}{Определитель 2-го порядка}
+\[
+\det A=\begin{vmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{vmatrix}=a_{11}a_{22}-a_{12}a_{21}.
+\]
+\end{fbx}
+
+\begin{fbx}{Определитель 3-го порядка (разложение по первой строке)}
+\[
+\det A=\begin{vmatrix}a_{11}&a_{12}&a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{vmatrix}
+=a_{11}\begin{vmatrix}a_{22}&a_{23}\\a_{32}&a_{33}\end{vmatrix}
+-a_{12}\begin{vmatrix}a_{21}&a_{23}\\a_{31}&a_{33}\end{vmatrix}
++a_{13}\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}.
+\]
+\end{fbx}
+
+Определитель 2-го порядка, получаемый вычёркиванием строки и столбца элемента $a_{1j}$, называется его \term{минором}.
+Знаки перед слагаемыми \akc{чередуются}: $+,\ -,\ +$.
+
+\begin{kvb}{Свойство}
+$\det A=\det A^T$.
+\end{kvb}
+
+\subsection{Условия коллинеарности и компланарности векторов}
+
+\begin{teo}[коллинеарность]
+Пусть в некотором базисе плоскости $\vec a(x_1;y_1)$, $\vec b(x_2;y_2)$. Тогда
+\[
+\vec a\parallel\vec b\iff\begin{vmatrix}x_1&y_1\\x_2&y_2\end{vmatrix}=0.
+\]
+\end{teo}
+
+\begin{proof}
+($\Rightarrow$) Если $\vec a\parallel\vec b$, то $\vec a=k\vec b$, т.\,е. $x_1=kx_2$, $y_1=ky_2$, откуда
+$x_1y_2-x_2y_1=kx_2y_2-kx_2y_2=0$.
+\end{proof}
+
+\begin{teo}[компланарность]
+Пусть в некотором базисе пространства $\vec a(x_1;y_1;z_1)$, $\vec b(x_2;y_2;z_2)$, $\vec c(x_3;y_3;z_3)$. Тогда
+\[
+\vec a,\vec b,\vec c\ \text{компланарны}\iff\begin{vmatrix}x_1&y_1&z_1\\x_2&y_2&z_2\\x_3&y_3&z_3\end{vmatrix}=0.
+\]
+\end{teo}
+
+% ===================== 3 =====================
+\section{Система координат}
+
+\subsection{Декартова система координат}
+
+\begin{opr}
+\term{Декартовой системой координат} (ДСК) в пространстве называют совокупность точки $O$ и базиса:
+$\{O;\vec e_1;\vec e_2;\vec e_3\}$. Точка $O$ — \term{начало координат}. Прямые, проходящие через начало координат
+в направлении базисных векторов, называются \term{осями координат}.
+\end{opr}
+
+\sidefig[0.38]{
+Вектор $\ov{OM}$ называется \term{радиус-вектором} точки $M$. Координаты точки $M$ — это координаты её радиус-вектора:
+\[
+\ov{OM}=x\vec e_1+y\vec e_2+z\vec e_3\iff M(x;y;z).
+\]
+$x$ — \term{абсцисса}, $y$ — \term{ордината}, $z$ — \term{аппликата}.
+}{
+\begin{tikzpicture}[iso,scale=0.95]
+  \draw[axis] (0,0,0) -- (3.4,0,0) node[below left] {$x$};
+  \draw[axis] (0,0,0) -- (0,3.6,0) node[right] {$y$};
+  \draw[axis] (0,0,0) -- (0,0,3.1) node[left] {$z$};
+  \coordinate (M) at (2.2,2.6,2.2);
+  \draw[aux] (2.2,0,0) -- (2.2,2.6,0) -- (0,2.6,0) (2.2,2.6,0) -- (M) (0,0,2.2) -- (M);
+  \node[left,font=\footnotesize] at (2.2,0,0) {$x$};
+  \node[below,font=\footnotesize] at (0,2.6,0) {$y$};
+  \node[left,font=\footnotesize] at (0,0,2.2) {$z$};
+  \draw[vecv] (0,0,0) -- (0.9,0,0) node[above left=-1pt,kviolet,font=\footnotesize] {$\vec e_1$};
+  \draw[vecv] (0,0,0) -- (0,0.9,0) node[below,kviolet,font=\footnotesize] {$\vec e_2$};
+  \draw[vecv] (0,0,0) -- (0,0,0.9) node[right,kviolet,font=\footnotesize] {$\vec e_3$};
+  \draw[veco] (0,0,0) -- (M);
+  \fill (M) circle (1.5pt) node[right] {$M(x;y;z)$};
+  \node[below right=-1pt] at (0,0,0) {$O$};
+\end{tikzpicture}}
+
+\subsection{Координаты вектора по координатам его концов}
+
+\begin{fbx}{Вектор по двум точкам}
+Если $M(x_1;y_1;z_1)$, $N(x_2;y_2;z_2)$, то $\ov{MN}=\ov{ON}-\ov{OM}$, т.\,е.
+\[
+\ov{MN}\,(x_2-x_1;\ y_2-y_1;\ z_2-z_1).
+\]
+\end{fbx}
+
+\subsection{Ортонормированный базис}
+
+\begin{opr}
+Базис называется \term{ортонормированным} (ОНБ), если его векторы попарно перпендикулярны (ортогональны) и по длине равны $1$:
+\[
+|\vec e_1|=|\vec e_2|=|\vec e_3|=1,\qquad \vec e_1\perp\vec e_2,\ \ \vec e_2\perp\vec e_3,\ \ \vec e_1\perp\vec e_3.
+\]
+\end{opr}
+ОНБ + ДСК = \term{ДПСК} — декартова прямоугольная система координат.
+
+\subsection{Деление отрезка в заданном отношении}
+
+\sidefig[0.32]{
+Пусть $A(x_1;y_1;z_1)$, $B(x_2;y_2;z_2)$ и точка $M(x;y;z)$ лежит на отрезке $AB$ так, что
+\[
+\frac{AM}{MB}=\frac{\lambda}{\mu},\qquad \lambda>0,\ \mu>0.
+\]
+Векторы $\ov{AM}$ и $\ov{MB}$ сонаправлены, поэтому $\mu\,\ov{AM}=\lambda\,\ov{MB}$, т.\,е.
+$\mu(x-x_1)=\lambda(x_2-x)$ (и аналогично для $y$, $z$).
+}{
+\begin{tikzpicture}
+  \coordinate (A) at (0,0); \coordinate (B) at (4,1.5); \coordinate (M) at ($(A)!0.42!(B)$);
+  \draw[line width=1pt] (A) -- (B);
+  \draw[kviolet,line width=2pt] (A) -- (M);
+  \draw[korange,line width=2pt] (M) -- (B);
+  \foreach \p/\l/\d in {A/A/below,B/B/right,M/M/below right} \fill (\p) circle (1.6pt) node[\d] {$\l$};
+  \node[kviolet,above left] at ($(A)!0.5!(M)$) {$\lambda$};
+  \node[korange,above left] at ($(M)!0.5!(B)$) {$\mu$};
+\end{tikzpicture}}
+
+\begin{fbx}{Координаты точки, делящей отрезок в отношении $\lambda:\mu$}
+\[
+x=\frac{\mu x_1+\lambda x_2}{\lambda+\mu},\qquad y=\frac{\mu y_1+\lambda y_2}{\lambda+\mu},\qquad z=\frac{\mu z_1+\lambda z_2}{\lambda+\mu}.
+\]
+\end{fbx}
+
+\begin{zam}
+При $\lambda=\mu$ получаем координаты середины отрезка: $x=\dfrac{x_1+x_2}{2}$ и т.\,д.
+\end{zam}
+
+% ===================== 4 =====================
+\section{Скалярное произведение векторов}
+
+\begin{opr}
+\term{Скалярным произведением} векторов $\vec a$ и $\vec b$ называется число
+\[
+(\vec a,\vec b)=|\vec a|\,|\vec b|\cos\varphi,\qquad \varphi=\angle(\vec a,\vec b).
+\]
+\end{opr}
+
+\begin{svv}
+\begin{enumerate}
+\item $(\vec a,\vec b)=(\vec b,\vec a)$ (коммутативность);
+\item $(\vec a,\vec a)=|\vec a|^2$;
+\item $(\alpha\vec a+\beta\vec b,\vec c)=\alpha(\vec a,\vec c)+\beta(\vec b,\vec c)$ (линейность);
+\item $(\vec a,\vec b)=0\iff\vec a=\vec 0$, или $\vec b=\vec 0$, или $\vec a\perp\vec b$.
+\end{enumerate}
+Для ОНБ: $(\vec e_1,\vec e_1)=(\vec e_2,\vec e_2)=(\vec e_3,\vec e_3)=1$, $(\vec e_1,\vec e_2)=(\vec e_1,\vec e_3)=(\vec e_2,\vec e_3)=0$.
+\end{svv}
+
+\begin{teo}
+Если базисные векторы попарно ортогональны, то координаты $\vec a(\alpha_1;\alpha_2;\alpha_3)$ любого вектора в этом базисе
+находятся по формулам
+\[
+\alpha_1=\frac{(\vec a,\vec e_1)}{|\vec e_1|^2},\qquad\alpha_2=\frac{(\vec a,\vec e_2)}{|\vec e_2|^2},\qquad\alpha_3=\frac{(\vec a,\vec e_3)}{|\vec e_3|^2}.
+\]
+\end{teo}
+
+\sidefig[0.34]{
+\begin{proof}
+$\vec a=\alpha_1\vec e_1+\alpha_2\vec e_2+\alpha_3\vec e_3$. Умножим скалярно на $\vec e_3$; так как
+$(\vec e_1,\vec e_3)=(\vec e_2,\vec e_3)=0$,
+\[
+(\vec a,\vec e_3)=\alpha_3(\vec e_3,\vec e_3)=\alpha_3|\vec e_3|^2\;\Rightarrow\;\alpha_3=\frac{(\vec a,\vec e_3)}{|\vec e_3|^2}.
+\]
+Аналогично для $\alpha_1$ и $\alpha_2$.
+\end{proof}
+}{
+\begin{tikzpicture}[iso,scale=0.9]
+  \coordinate (P) at (2,2.6,2.2);
+  \draw[thin aux] (2,0,0) -- (2,2.6,0) -- (0,2.6,0) (2,2.6,0) -- (P) (0,0,2.2) -- (P);
+  \draw[vecv] (0,0,0) -- (2,0,0) node[left,kviolet,font=\footnotesize] {$\alpha_1\vec e_1$};
+  \draw[vecv] (0,0,0) -- (0,2.6,0) node[below,kviolet,font=\footnotesize] {$\alpha_2\vec e_2$};
+  \draw[vecv] (0,0,0) -- (0,0,2.2) node[left,kviolet,font=\footnotesize] {$\alpha_3\vec e_3$};
+  \draw[->,black,line width=1pt] (0,0,0) -- (0.8,0,0);
+  \draw[->,black,line width=1pt] (0,0,0) -- (0,0.8,0);
+  \draw[->,black,line width=1pt] (0,0,0) -- (0,0,0.8);
+  \draw[veco] (0,0,0) -- (P) node[above right,korange] {$\vec a$};
+\end{tikzpicture}}
+
+\begin{fbx}{Формулы в ОНБ: $\vec a(x_1;y_1;z_1)$, $\vec b(x_2;y_2;z_2)$}
+\begin{enumerate}
+\item $(\vec a,\vec b)=x_1x_2+y_1y_2+z_1z_2$;
+\item $|\vec a|=\sqrt{x_1^2+y_1^2+z_1^2}$;
+\item $\cos\varphi=\dfrac{x_1x_2+y_1y_2+z_1z_2}{\sqrt{x_1^2+y_1^2+z_1^2}\,\sqrt{x_2^2+y_2^2+z_2^2}}$;
+\item расстояние между точками $A$ и $B$: $\rho(A,B)=|\ov{AB}|=\sqrt{(x_B-x_A)^2+(y_B-y_A)^2+(z_B-z_A)^2}$.
+\end{enumerate}
+\end{fbx}
+
+% ===================== 5 =====================
+\section{Векторное и смешанное произведения}
+
+\subsection{Правая и левая тройки векторов}
+
+\sidefig[0.3]{
+\begin{opr}
+Некомпланарные векторы $\{\vec a;\vec b;\vec c\}$ образуют \term{правую тройку}, если при взгляде с конца третьего вектора $\vec c$
+кратчайший поворот от первого вектора $\vec a$ ко второму $\vec b$ виден \akc{против часовой стрелки}. Иначе тройка называется \term{левой}.
+\end{opr}
+}{
+\begin{tikzpicture}[iso,scale=0.9]
+  \draw[vecv] (0,0,0) -- (2.2,0,0) node[left,kviolet] {$\vec a$};
+  \draw[vecv] (0,0,0) -- (0,2.4,0) node[right,kviolet] {$\vec b$};
+  \draw[veco] (0,0,0) -- (0,0,2.3) node[above,korange] {$\vec c$};
+  \draw[->,kgray,line width=0.7pt] (1.1,0,0) to[bend right=30] node[below,font=\footnotesize,black] {$\varphi$} (0,1.2,0);
+\end{tikzpicture}}
+
+\subsection{Векторное произведение}
+
+\begin{opr}
+\term{Векторным произведением} векторов $\vec a$ и $\vec b$ называется вектор $\vec c=[\vec a,\vec b]=\vec a\times\vec b$,
+удовлетворяющий условиям:
+\begin{enumerate}
+\item $\vec c\perp\vec a$, $\vec c\perp\vec b$;
+\item $|\vec c|=|\vec a|\,|\vec b|\sin\varphi$, где $\varphi=\angle(\vec a,\vec b)$;
+\item $\{\vec a;\vec b;\vec c\}$ — правая тройка.
+\end{enumerate}
+\end{opr}
+
+\begin{svv}
+\begin{enumerate}
+\item $[\vec a,\vec b]=-[\vec b,\vec a]$ (антикоммутативность);
+\item $[\alpha\vec a+\beta\vec b,\vec c]=\alpha[\vec a,\vec c]+\beta[\vec b,\vec c]$ (линейность);
+\item $[\vec a,\vec b]=\vec 0\iff\vec a=\vec 0$, или $\vec b=\vec 0$, или $\vec a\parallel\vec b$.
+\end{enumerate}
+Для правого ОНБ: $[\vec e_1,\vec e_2]=\vec e_3$, $[\vec e_2,\vec e_3]=\vec e_1$, $[\vec e_3,\vec e_1]=\vec e_2$,
+$[\vec e_1,\vec e_1]=[\vec e_2,\vec e_2]=[\vec e_3,\vec e_3]=\vec 0$.
+\end{svv}
+
+\sidefig[0.34]{
+\textbf{Геометрический смысл.} Модуль векторного произведения равен площади параллелограмма, построенного на векторах $\vec a$ и $\vec b$:
+\[
+S_{\text{пар}}=\bigl|[\vec a,\vec b]\bigr|,\qquad S_{\triangle}=\tfrac12\bigl|[\vec a,\vec b]\bigr|.
+\]
+}{
+\begin{tikzpicture}
+  \coordinate (O) at (0,0); \coordinate (B) at (3,0); \coordinate (A) at (1,1.4); \coordinate (C) at (4,1.4);
+  \fill[kviolet!12] (O) -- (B) -- (C) -- (A) -- cycle;
+  \draw[aux] (A) -- (C) -- (B);
+  \draw[vecv] (O) -- (A) node[midway,left,kviolet] {$\vec a$};
+  \draw[vecv] (O) -- (B) node[midway,below,kviolet] {$\vec b$};
+  \node at (2,0.7) {$S$};
+  \draw[korange] (0.45,0) arc (0:54:0.45); \node[korange,font=\footnotesize] at (0.62,0.28) {$\varphi$};
+\end{tikzpicture}}
+
+\begin{teo}[координаты векторного произведения]
+В правом ОНБ $\{\vec e_1;\vec e_2;\vec e_3\}$ для $\vec a(\alpha_1;\alpha_2;\alpha_3)$, $\vec b(\beta_1;\beta_2;\beta_3)$:
+\[
+[\vec a,\vec b]=\begin{vmatrix}\vec e_1&\vec e_2&\vec e_3\\ \alpha_1&\alpha_2&\alpha_3\\ \beta_1&\beta_2&\beta_3\end{vmatrix}
+=\underbrace{\begin{vmatrix}\alpha_2&\alpha_3\\ \beta_2&\beta_3\end{vmatrix}}_{x}\vec e_1
+-\underbrace{\begin{vmatrix}\alpha_1&\alpha_3\\ \beta_1&\beta_3\end{vmatrix}}_{-y}\vec e_2
++\underbrace{\begin{vmatrix}\alpha_1&\alpha_2\\ \beta_1&\beta_2\end{vmatrix}}_{z}\vec e_3.
+\]
+\end{teo}
+
+\begin{proof}
+По линейности $[\vec a,\vec b]=[\alpha_1\vec e_1+\alpha_2\vec e_2+\alpha_3\vec e_3,\ \beta_1\vec e_1+\beta_2\vec e_2+\beta_3\vec e_3]
+=\sum\limits_{i,j}\alpha_i\beta_j[\vec e_i,\vec e_j]$. Слагаемые с $[\vec e_i,\vec e_i]=\vec 0$ исчезают, а остальные с учётом
+таблицы для правого ОНБ дают
+\[
+[\vec a,\vec b]=(\alpha_2\beta_3-\alpha_3\beta_2)\vec e_1+(\alpha_3\beta_1-\alpha_1\beta_3)\vec e_2+(\alpha_1\beta_2-\alpha_2\beta_1)\vec e_3.\qedhere
+\]
+\end{proof}
+
+\begin{fbx}{Условие коллинеарности в координатах}
+\[
+\vec a\parallel\vec b\iff[\vec a,\vec b]=\vec 0\iff
+\begin{vmatrix}\alpha_2&\alpha_3\\ \beta_2&\beta_3\end{vmatrix}=
+\begin{vmatrix}\alpha_1&\alpha_3\\ \beta_1&\beta_3\end{vmatrix}=
+\begin{vmatrix}\alpha_1&\alpha_2\\ \beta_1&\beta_2\end{vmatrix}=0.
+\]
+\end{fbx}
+
+\subsection{Смешанное произведение}
+
+\begin{opr}
+\term{Смешанным произведением} векторов $\vec a,\vec b,\vec c$ называется число
+\[
+(\vec a,\vec b,\vec c)=\bigl(\vec a,[\vec b,\vec c]\bigr).
+\]
+\end{opr}
+
+\begin{svv}
+\begin{enumerate}
+\item Линейность: $(\alpha\vec a+\beta\vec b,\vec c,\vec d)=\alpha(\vec a,\vec c,\vec d)+\beta(\vec b,\vec c,\vec d)$;
+\item циклическая перестановка не меняет значения, а перестановка двух векторов меняет знак:
+\[
+(\vec a,\vec b,\vec c)=(\vec b,\vec c,\vec a)=(\vec c,\vec a,\vec b)=-(\vec b,\vec a,\vec c)=-(\vec a,\vec c,\vec b)=-(\vec c,\vec b,\vec a);
+\]
+\item $(\vec a,\vec b,\vec c)=0\iff$ хотя бы один из векторов нулевой или $\vec a,\vec b,\vec c$ компланарны.
+\end{enumerate}
+\end{svv}
+
+\begin{teo}[смешанное произведение в координатах]
+В ОНБ для $\vec a(\alpha_1;\alpha_2;\alpha_3)$, $\vec b(\beta_1;\beta_2;\beta_3)$, $\vec c(\gamma_1;\gamma_2;\gamma_3)$:
+\[
+(\vec a,\vec b,\vec c)=\begin{vmatrix}\alpha_1&\alpha_2&\alpha_3\\ \beta_1&\beta_2&\beta_3\\ \gamma_1&\gamma_2&\gamma_3\end{vmatrix}.
+\]
+\end{teo}
+
+\sidefig[0.32]{
+\textbf{Геометрический смысл.} Модуль смешанного произведения равен объёму параллелепипеда, построенного на векторах $\vec a,\vec b,\vec c$:
+\[
+V_{\text{пар}}=\bigl|(\vec a,\vec b,\vec c)\bigr|,\qquad V_{\text{тетр}}=\tfrac16\bigl|(\vec a,\vec b,\vec c)\bigr|.
+\]
+}{
+\begin{tikzpicture}[iso,scale=0.85]
+  \coordinate (O) at (0,0,0); \coordinate (a) at (2.2,0,0); \coordinate (b) at (0.3,2.6,0); \coordinate (c) at (0.4,0.6,2);
+  \fill[kviolet!10] (O) -- (a) -- ($(a)+(b)$) -- (b) -- cycle;
+  \draw[thin aux] ($(a)$) -- ($(a)+(c)$) -- ($(a)+(b)+(c)$) -- ($(b)+(c)$) -- (c) -- ($(a)+(c)$)
+    ($(a)+(b)$) -- ($(a)+(b)+(c)$) (b) -- ($(b)+(c)$) (a) -- ($(a)+(b)$) -- (b);
+  \draw[vecv] (O) -- (a) node[left,kviolet] {$\vec a$};
+  \draw[vecv] (O) -- (b) node[below right,kviolet] {$\vec b$};
+  \draw[veco] (O) -- (c) node[left,korange] {$\vec c$};
+  \node at ($0.5*(a)+0.5*(b)+0.5*(c)$) {$V$};
+\end{tikzpicture}}
+
+\subsection{Неравенство Коши–Буняковского}
+Площадь параллелограмма $S=|\vec a|\,|\vec b|\sin\varphi$, поэтому
+\[
+0\leqslant S^2=|\vec a|^2|\vec b|^2\sin^2\varphi=|\vec a|^2|\vec b|^2(1-\cos^2\varphi)=|\vec a|^2|\vec b|^2-(\vec a,\vec b)^2.
+\]
+
+\begin{fbx}{Неравенство Коши–Буняковского}
+\[
+(\vec a,\vec b)^2\leqslant|\vec a|^2|\vec b|^2\iff
+\begin{vmatrix}(\vec a,\vec a)&(\vec a,\vec b)\\(\vec a,\vec b)&(\vec b,\vec b)\end{vmatrix}\geqslant0.
+\]
+\end{fbx}
+
+\subsection{Двойное векторное произведение}
+
+\begin{fbx}{Формула «бац минус цаб»}
+\[
+\bigl[\vec a,[\vec b,\vec c]\bigr]=\vec b\,(\vec a,\vec c)-\vec c\,(\vec a,\vec b).
+\]
+\end{fbx}
+
+% ===================== 6 =====================
+\section{Сфера и шар}
+
+\sidefig[0.3]{
+\begin{opr}
+\term{Сфера} — множество всех точек пространства, равноудалённых от фиксированной точки (центра) на положительное расстояние $R$ (радиус).
+\term{Шар} — множество точек, удалённых от центра не более чем на $R$.
+\end{opr}
+}{
+\begin{tikzpicture}[scale=0.9]
+  \shade[ball color=kviolet!30] (0,0) circle (1.5);
+  \draw[kviolet,line width=0.8pt] (0,0) circle (1.5);
+  \draw[kviolet] (-1.5,0) arc (180:360:1.5 and 0.45);
+  \draw[kviolet,dashed] (1.5,0) arc (0:180:1.5 and 0.45);
+  \fill (0,0) circle (1.4pt) node[below left] {$O$};
+  \draw[korange,line width=1pt] (0,0) -- (1.06,1.06) node[midway,above left] {$R$};
+\end{tikzpicture}}
+
+\begin{fbx}{Уравнения}
+Центр $O(0;0;0)$: $\quad x^2+y^2+z^2=R^2$.\\
+Центр $C(x_0;y_0;z_0)$: $\quad(x-x_0)^2+(y-y_0)^2+(z-z_0)^2=R^2$.\\
+Шар: $\quad(x-x_0)^2+(y-y_0)^2+(z-z_0)^2\leqslant R^2$.
+\end{fbx}
+
+\begin{fbx}{Площадь сферы и объём шара}
+\[
+S_{\text{сф}}=4\pi R^2,\qquad V_{\text{ш}}=\tfrac43\pi R^3.
+\]
+\end{fbx}
+
+% ===================== 7 =====================
+\section{Прямая}
+
+\subsection{Уравнения прямой в пространстве}
+
+\sidefig[0.34]{
+Пусть прямая проходит через точку $M_0(x_0;y_0;z_0)$ параллельно ненулевому вектору $\vec a(\alpha;\beta;\gamma)$ —
+\term{направляющему вектору} прямой. Обозначим $\ov{OM_0}=\vec r_0$, $\ov{OM}=\vec r$ для произвольной точки $M(x;y;z)$ прямой.
+Тогда $\ov{M_0M}\parallel\vec a$, т.\,е. $\ov{M_0M}=t\vec a$, и
+\[
+\ov{OM}=\ov{OM_0}+\ov{M_0M}.
+\]
+}{
+\begin{tikzpicture}
+  \coordinate (O) at (0,0); \coordinate (M0) at (0.6,2.2); \coordinate (M) at (3.4,1.4);
+  \draw[line width=0.9pt] ($(M0)!-0.3!(M)$) -- ($(M0)!1.3!(M)$);
+  \draw[vecv] (O) -- (M0) node[midway,left,kviolet] {$\vec r_0$};
+  \draw[vecv] (O) -- (M) node[midway,below right,kviolet] {$\vec r$};
+  \draw[veco] (M0) -- ($(M0)!0.45!(M)$) node[above,korange] {$\vec a$};
+  \fill (O) circle (1.4pt) node[below left] {$O$};
+  \fill (M0) circle (1.6pt) node[above] {$M_0$};
+  \fill (M) circle (1.6pt) node[above] {$M$};
+\end{tikzpicture}}
+
+\begin{fbx}{Уравнения прямой}
+\textbf{Векторное:} $\vec r=\vec r_0+t\vec a$, $t\in\RR$.
+
+\textbf{Векторно-параметрическое (параметрическое):}\quad
+$\begin{cases}x=x_0+\alpha t,\\ y=y_0+\beta t,\\ z=z_0+\gamma t.\end{cases}$
+
+\textbf{Каноническое:}\quad$\dfrac{x-x_0}{\alpha}=\dfrac{y-y_0}{\beta}=\dfrac{z-z_0}{\gamma}\ \ (=t).$
+\end{fbx}
+
+\begin{zam}
+Если одна из координат направляющего вектора равна нулю, например $\alpha=0$, то каноническое уравнение записывают так:
+$x=x_0$, $\dfrac{y-y_0}{\beta}=\dfrac{z-z_0}{\gamma}$.
+\end{zam}
+
+То же условие $\vec r-\vec r_0\parallel\vec a$ можно записать через векторное произведение:
+\[
+[\vec r-\vec r_0,\vec a]=\vec 0\iff
+\begin{vmatrix}y-y_0&z-z_0\\ \beta&\gamma\end{vmatrix}=
+\begin{vmatrix}x-x_0&z-z_0\\ \alpha&\gamma\end{vmatrix}=
+\begin{vmatrix}x-x_0&y-y_0\\ \alpha&\beta\end{vmatrix}=0.
+\]
+
+\begin{fbx}{Прямая через две точки $A$ и $B$}
+Направляющий вектор $\vec a=\ov{AB}\,(x_B-x_A;\ y_B-y_A;\ z_B-z_A)$:
+\[
+\frac{x-x_A}{x_B-x_A}=\frac{y-y_A}{y_B-y_A}=\frac{z-z_A}{z_B-z_A}.
+\]
+\end{fbx}
+
+\subsection{Прямая как линия пересечения плоскостей}
+Прямую можно задать системой уравнений двух непараллельных плоскостей:
+\[
+\begin{cases}A_1x+B_1y+C_1z+D_1=0,\\ A_2x+B_2y+C_2z+D_2=0.\end{cases}
+\]
+Чтобы перейти к каноническому уравнению, из системы выражают две переменные через третью (или находят одну точку прямой),
+а направляющий вектор можно взять равным $\vec a=[\vec n_1,\vec n_2]$, где $\vec n_1$, $\vec n_2$ — нормальные векторы плоскостей
+(см. раздел~\ref{sec:plane}).
+
+\subsection{Уравнение прямой на плоскости}
+
+\begin{fbx}{Общее уравнение прямой на плоскости}
+\[
+Ax+By+C=0.
+\]
+Если $B\ne0$: $y=-\dfrac AB x-\dfrac CB$, т.\,е. $y=kx+b$, где $k=\operatorname{tg}\alpha$ — \term{угловой коэффициент}.
+\end{fbx}
+
+\begin{zam}
+Для касательной к графику функции $y=f(x)$ в точке $x_0$: $k=\operatorname{tg}\alpha=f'(x_0)$.
+\end{zam}
+
+% ===================== 8 =====================
+\section{Плоскость}\label{sec:plane}
+
+\subsection{Уравнения плоскости}
+
+\sidefig[0.34]{
+Пусть плоскость проходит через точку $M_0(x_0;y_0;z_0)$ и параллельна неколлинеарным векторам $\vec p(\alpha_1;\beta_1;\gamma_1)$
+и $\vec q(\alpha_2;\beta_2;\gamma_2)$ (они образуют базис в плоскости). Для произвольной точки $M(x;y;z)$ плоскости
+$\ov{M_0M}=u\vec p+v\vec q$, а $\vec r=\vec r_0+\ov{M_0M}$.
+}{
+\begin{tikzpicture}
+  \fill[kviolet!10] (0,0) -- (3.6,0) -- (4.6,1.6) -- (1,1.6) -- cycle;
+  \draw[kviolet!60] (0,0) -- (3.6,0) -- (4.6,1.6) -- (1,1.6) -- cycle;
+  \coordinate (M0) at (1.2,0.45);
+  \draw[vecv] (M0) -- (2.4,0.45) node[below,kviolet] {$\vec p$};
+  \draw[vecv] (M0) -- (1.65,1.2) node[left,kviolet] {$\vec q$};
+  \draw[line width=0.8pt,->] (M0) -- (3.4,1.15);
+  \fill (M0) circle (1.5pt) node[below left] {$M_0$};
+  \fill (3.4,1.15) circle (1.5pt) node[right] {$M$};
+  \draw[veco] (M0) -- (1.2,2.4) node[above,korange] {$\vec n$};
+  \draw[korange,line width=0.5pt] (1.2,0.75) -- (1.42,0.75) -- (1.42,0.45);
+\end{tikzpicture}}
+
+\begin{fbx}{Уравнения плоскости}
+\textbf{Векторное:} $\vec r=\vec r_0+u\vec p+v\vec q$.
+
+\textbf{Векторно-параметрическое:}\quad
+$\begin{cases}x=x_0+u\alpha_1+v\alpha_2,\\ y=y_0+u\beta_1+v\beta_2,\\ z=z_0+u\gamma_1+v\gamma_2.\end{cases}$
+
+\textbf{Через условие компланарности} $(\ov{M_0M},\vec p,\vec q)=0$:
+\[
+\begin{vmatrix}x-x_0&y-y_0&z-z_0\\ \alpha_1&\beta_1&\gamma_1\\ \alpha_2&\beta_2&\gamma_2\end{vmatrix}=0.
+\]
+\end{fbx}
+
+\subsection{Вектор нормали и общее уравнение плоскости}
+Так как $(\ov{M_0M},\vec p,\vec q)=(\ov{M_0M},[\vec p,\vec q])=0$, обозначим $\vec n=[\vec p,\vec q]$ — \term{вектор нормали}
+плоскости ($\vec n\perp$ плоскости), $\vec n(A;B;C)$. Тогда
+\[
+(\vec r-\vec r_0,\vec n)=0\;\Rightarrow\;(\vec r,\vec n)=(\vec r_0,\vec n)=D_1.
+\]
+Положив $D=-D_1$, получаем:
+
+\begin{fbx}{Общее уравнение плоскости}
+\[
+Ax+By+Cz+D=0,\qquad \vec n(A;B;C)\ \text{— вектор нормали.}
+\]
+\end{fbx}
+
+\subsection{Плоскость через три точки и через прямую и точку}
+
+\begin{fbx}{Плоскость через три точки $A$, $B$, $C$, не лежащие на одной прямой}
+\[
+\begin{vmatrix}x-x_A&y-y_A&z-z_A\\ x_B-x_A&y_B-y_A&z_B-z_A\\ x_C-x_A&y_C-y_A&z_C-z_A\end{vmatrix}=0.
+\]
+\end{fbx}
+
+\begin{fbx}{Плоскость через прямую $a$ и точку $C\notin a$}
+Пусть $M(x_M;y_M;z_M)\in a$, $\vec a(\alpha;\beta;\gamma)$ — направляющий вектор прямой. Тогда
+\[
+\begin{vmatrix}x-x_M&y-y_M&z-z_M\\ \alpha&\beta&\gamma\\ x_C-x_M&y_C-y_M&z_C-z_M\end{vmatrix}=0.
+\]
+\end{fbx}
+
+% ===================== 9 =====================
+\section{Углы между прямыми и плоскостями}
+
+\subsection{Угол между двумя прямыми}
+
+\sidefig[0.32]{
+Пусть $\vec a_1(\alpha_1;\beta_1;\gamma_1)$, $\vec a_2(\alpha_2;\beta_2;\gamma_2)$ — направляющие векторы прямых.
+Угол между прямыми $\varphi\in[0^\circ;90^\circ]$, поэтому $\cos\varphi\geqslant0$ и $\cos\varphi=|\cos\varphi^*|$,
+где $\varphi^*$ — угол между направляющими векторами.
+}{
+\begin{tikzpicture}
+  \coordinate (P) at (0,0);
+  \draw[line width=0.9pt] (-1.6,-1.6) -- (1.3,1.3);
+  \draw[line width=0.9pt] (-2,-0.6) -- (2,0.6);
+  \draw[vecv] (P) -- (0.95,0.95) node[above left,kviolet] {$\vec a_1$};
+  \draw[veco] (P) -- (1.4,0.42) node[below right,korange] {$\vec a_2$};
+  \draw (0.55,0.165) arc (16.7:45:0.57); \node[font=\footnotesize] at (0.85,0.48) {$\varphi$};
+\end{tikzpicture}}
+
+\begin{fbx}{Угол между прямыми}
+\[
+\cos\varphi=\frac{|(\vec a_1,\vec a_2)|}{|\vec a_1|\,|\vec a_2|}
+=\frac{|\alpha_1\alpha_2+\beta_1\beta_2+\gamma_1\gamma_2|}{\sqrt{\alpha_1^2+\beta_1^2+\gamma_1^2}\,\sqrt{\alpha_2^2+\beta_2^2+\gamma_2^2}}.
+\]
+\end{fbx}
+
+\subsection{Угол между плоскостями}
+
+\sidefig[0.34]{
+Угол между плоскостями равен углу между их нормалями (берётся острый или прямой угол).
+Пусть $\vec n_1(A_1;B_1;C_1)$, $\vec n_2(A_2;B_2;C_2)$ — векторы нормалей.
+}{
+\begin{tikzpicture}
+  \coordinate (P) at (0,0);
+  \draw[kviolet,line width=1pt] (-2,0) -- (2,0) node[right] {$\alpha_1$};
+  \draw[korange,line width=1pt] (-1.8,1.04) -- (1.8,-1.04) node[right] {$\alpha_2$};
+  \draw[vecv] (-1,0) -- (-1,1.2) node[above,kviolet] {$\vec n_1$};
+  \draw[veco] (-1.2,0.69) -- ($(-1.2,0.69)+(0.6,1.04)$) node[above,korange] {$\vec n_2$};
+  \draw (0.7,0) arc (0:-30:0.7); \node[font=\footnotesize] at (0.98,-0.22) {$\varphi$};
+  \fill (P) circle (1.3pt);
+  \node[font=\scriptsize,kgray] at (0,-1.45) {(вид вдоль линии пересечения)};
+\end{tikzpicture}}
+
+\begin{fbx}{Угол между плоскостями}
+\[
+\cos\varphi=\frac{|(\vec n_1,\vec n_2)|}{|\vec n_1|\,|\vec n_2|}
+=\frac{|A_1A_2+B_1B_2+C_1C_2|}{\sqrt{A_1^2+B_1^2+C_1^2}\,\sqrt{A_2^2+B_2^2+C_2^2}}.
+\]
+\end{fbx}
+
+\subsection{Угол между прямой и плоскостью}
+
+\sidefig[0.32]{
+Пусть $\vec a(\alpha;\beta;\gamma)$ — направляющий вектор прямой, $\vec n(A;B;C)$ — нормаль плоскости, $\varphi$ — угол между прямой
+и плоскостью, $\psi$ — угол между прямой и нормалью. Так как $\varphi+\psi=90^\circ$, то $\sin\varphi=\cos\psi$.
+}{
+\begin{tikzpicture}
+  \fill[kviolet!10] (-2,-0.6) -- (1.4,-0.6) -- (2.2,0.6) -- (-1.2,0.6) -- cycle;
+  \draw[kviolet!60] (-2,-0.6) -- (1.4,-0.6) -- (2.2,0.6) -- (-1.2,0.6) -- cycle;
+  \coordinate (P) at (0,0);
+  \draw[aux] (P) -- (1.2,0);
+  \draw[line width=0.9pt] (-0.8,-1.0) -- (1.2,1.5);
+  \draw[veco] (P) -- (0,1.6) node[above,korange] {$\vec n$};
+  \draw[vecv] (P) -- (0.8,1.0) node[right,kviolet] {$\vec a$};
+  \draw (0.55,0) arc (0:51:0.55); \node[font=\footnotesize] at (0.75,0.3) {$\varphi$};
+  \draw (0,0.75) arc (90:51:0.75); \node[font=\footnotesize] at (0.25,1.0) {$\psi$};
+  \fill (P) circle (1.3pt);
+\end{tikzpicture}}
+
+\begin{fbx}{Угол между прямой и плоскостью}
+\[
+\sin\varphi=\frac{|(\vec a,\vec n)|}{|\vec a|\,|\vec n|}
+=\frac{|A\alpha+B\beta+C\gamma|}{\sqrt{A^2+B^2+C^2}\,\sqrt{\alpha^2+\beta^2+\gamma^2}}.
+\]
+\end{fbx}
+
+% ===================== 10 =====================
+\section{Расстояния}
+
+\subsection{Расстояние от точки до плоскости}
+
+\sidefig[0.34]{
+Пусть $M(\vec r_1)$ — данная точка, $M_0(\vec r_0)$ — точка плоскости, $\vec n$ — её нормаль, $H$ — основание перпендикуляра из $M$,
+$\psi$ — угол между $\ov{M_0M}$ и $\vec n$. Тогда
+\[
+\rho=|MH|=|\ov{M_0M}|\,|\cos\psi|=|\vec r_1-\vec r_0|\,|\cos\psi|,
+\]
+\[
+|(\vec r_1-\vec r_0,\vec n)|=|\vec r_1-\vec r_0|\,|\vec n|\,|\cos\psi|=\rho\,|\vec n|.
+\]
+}{
+\begin{tikzpicture}
+  \fill[kviolet!10] (-0.6,-0.7) -- (3.0,-0.7) -- (3.8,0.6) -- (0.2,0.6) -- cycle;
+  \draw[kviolet!60] (-0.6,-0.7) -- (3.0,-0.7) -- (3.8,0.6) -- (0.2,0.6) -- cycle;
+  \coordinate (H) at (0.8,-0.1); \coordinate (M) at (0.8,2.4); \coordinate (M0) at (2.8,-0.2);
+  \draw[korange,line width=1.1pt] (H) -- (M) node[midway,left] {$\rho$};
+  \draw[line width=0.9pt,->] (M0) -- (M);
+  \draw[aux] (H) -- (M0);
+  \draw[veco] (M0) -- (2.8,1.6) node[above,korange] {$\vec n$};
+  \draw (0.8,0.15) -- (1.05,0.13) -- (1.05,-0.12);
+  \draw (2.8,0.55) arc (90:128:0.75); \node[font=\footnotesize] at (2.55,0.85) {$\psi$};
+  \fill (H) circle (1.4pt) node[below left] {$H$};
+  \fill (M) circle (1.5pt) node[above] {$M$};
+  \fill (M0) circle (1.4pt) node[below right] {$M_0$};
+\end{tikzpicture}}
+
+\begin{fbx}{Расстояние от точки до плоскости}
+\[
+\rho=\frac{|(\vec r_1-\vec r_0,\vec n)|}{|\vec n|}.
+\]
+Если плоскость задана уравнением $Ax+By+Cz+D=0$, а точка — $M(x_1;y_1;z_1)$, то
+\[
+\rho(M,\alpha)=\frac{|Ax_1+By_1+Cz_1+D|}{\sqrt{A^2+B^2+C^2}}.
+\]
+\end{fbx}
+
+\subsection{Расстояние от точки до прямой}
+
+\sidefig[0.34]{
+Пусть прямая проходит через точку $M_0(\vec r_0)$ с направляющим вектором $\vec a$, $M(\vec r_1)$ — данная точка.
+Построим параллелограмм на векторах $\ov{M_0M}$ и $\vec a$. Его площадь
+\[
+S=\rho\cdot|\vec a|,\qquad S=|[\vec a,\ov{M_0M}]|=|[\vec r_1-\vec r_0,\vec a]|.
+\]
+}{
+\begin{tikzpicture}
+  \coordinate (M0) at (0,0); \coordinate (A) at (2,0.6); \coordinate (M) at (0.9,2);
+  \fill[kviolet!10] (M0) -- (A) -- ($(A)+(M)$) -- (M) -- cycle;
+  \draw[aux] (A) -- ($(A)+(M)$) -- (M);
+  \draw[line width=0.9pt] (-0.6,-0.18) -- (3.8,1.14);
+  \draw[veco] (M0) -- (A) node[below right,korange] {$\vec a$};
+  \draw[line width=0.9pt,->] (M0) -- (M);
+  \coordinate (F) at ($(M0)!(M)!(A)$);
+  \draw[kviolet,line width=1.1pt] (M) -- (F) node[midway,right] {$\rho$};
+  \fill (M0) circle (1.4pt) node[below] {$M_0$};
+  \fill (M) circle (1.5pt) node[above left] {$M$};
+\end{tikzpicture}}
+
+\begin{fbx}{Расстояние от точки до прямой}
+\[
+\rho=\frac{|[\vec r_1-\vec r_0,\vec a]|}{|\vec a|}=\frac{|[\ov{M_0M},\vec a]|}{|\vec a|}.
+\]
+\end{fbx}
+
+\subsection{Расстояние между скрещивающимися прямыми}
+
+\sidefig[0.36]{
+Пусть прямые проходят через точки $M_1(\vec r_1)$ и $M_2(\vec r_2)$ с направляющими векторами $\vec a_1$ и $\vec a_2$.
+Построим параллелепипед на векторах $\vec a_1$, $\vec a_2$, $\vec r_2-\vec r_1$. Расстояние между прямыми равно его высоте:
+\[
+V=S_{\text{осн}}\cdot\rho,\quad S_{\text{осн}}=|[\vec a_1,\vec a_2]|,\quad V=|(\vec r_2-\vec r_1,\vec a_1,\vec a_2)|.
+\]
+}{
+\begin{tikzpicture}
+  \coordinate (M1) at (0,0); \coordinate (a1) at (2.6,0.2); \coordinate (a2) at (0.7,1.0); \coordinate (M2) at (0.3,1.7);
+  \fill[kviolet!10] (M1) -- (a1) -- ($(a1)+(a2)$) -- (a2) -- cycle;
+  \draw[thin aux] ($(M2)$) -- ($(M2)+(a1)$) -- ($(M2)+(a1)+(a2)$) -- ($(M2)+(a2)$) -- cycle
+     (a1) -- ($(M2)+(a1)$) ($(a1)+(a2)$) -- ($(M2)+(a1)+(a2)$) (a2) -- ($(M2)+(a2)$) (a1) -- ($(a1)+(a2)$) -- (a2);
+  \draw[line width=0.9pt] (-0.5,-0.04) -- (3.6,0.28);
+  \draw[line width=0.9pt] ($(M2)-0.6*(a2)$) -- ($(M2)+1.6*(a2)$);
+  \draw[vecv] (M1) -- (a1) node[below right,kviolet] {$\vec a_1$};
+  \draw[veco] (M2) -- ($(M2)+(a2)$) node[above left,korange] {$\vec a_2$};
+  \draw[line width=0.8pt,->] (M1) -- (M2);
+  \draw[aux] (M2) -- (0.3,0.35) node[pos=0.5,right,font=\footnotesize] {$\rho$};
+  \fill (M1) circle (1.4pt) node[below] {$M_1$};
+  \fill (M2) circle (1.4pt) node[left] {$M_2$};
+\end{tikzpicture}}
+
+\begin{fbx}{Расстояние между скрещивающимися прямыми}
+\[
+\rho=\frac{|(\vec r_2-\vec r_1,\vec a_1,\vec a_2)|}{|[\vec a_1,\vec a_2]|}=\frac{|(\ov{M_1M_2},\vec a_1,\vec a_2)|}{|[\vec a_1,\vec a_2]|}.
+\]
+\end{fbx}
+
+\subsection{Биссекторные плоскости}
+
+\sidefig[0.34]{
+Множество точек, равноудалённых от двух пересекающихся плоскостей $A_1x+B_1y+C_1z+D_1=0$ и $A_2x+B_2y+C_2z+D_2=0$,
+задаётся условием $\rho_1=\rho_2$:
+\[
+\frac{|A_1x+B_1y+C_1z+D_1|}{\sqrt{A_1^2+B_1^2+C_1^2}}=\frac{|A_2x+B_2y+C_2z+D_2|}{\sqrt{A_2^2+B_2^2+C_2^2}}.
+\]
+Раскрывая модули (со знаком «$+$» и «$-$»), получаем уравнения двух \term{биссекторных плоскостей} — они делят двугранные углы
+между данными плоскостями пополам.
+}{
+\begin{tikzpicture}
+  \draw[kviolet,line width=1pt] (-2,-0.5) -- (2,0.5) node[right] {$\alpha_1$};
+  \draw[korange,line width=1pt] (-1.4,1.4) -- (1.4,-1.4) node[right] {$\alpha_2$};
+  % биссектрисы: углы 14° и -45° -> (14-45)/2=-15.5 и +74.5
+  \draw[kgray,dashed,line width=0.8pt] ({-2*cos(15.5)},{2*sin(15.5)}) -- ({2*cos(15.5)},{-2*sin(15.5)});
+  \draw[kgray,dashed,line width=0.8pt] ({-1.8*cos(74.5)},{-1.8*sin(74.5)}) -- ({1.8*cos(74.5)},{1.8*sin(74.5)});
+  \node[font=\scriptsize,kgray,align=center] at (0.9,1.95) {биссекторные\\плоскости};
+  \fill (0,0) circle (1.3pt);
+  \node[font=\scriptsize,kgray] at (0,-1.75) {(вид вдоль линии пересечения)};
+\end{tikzpicture}}
+
+% ===================== 11 =====================
+\section{Сводка формул метода координат}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.9}
+\begin{tabular}{>{\raggedright\arraybackslash}m{4.6cm} >{\raggedright\arraybackslash}m{10.6cm}}
+\toprule
+{\hfont\color{kviolet}Что найти} & {\hfont\color{kviolet}Формула}\\
+\midrule
+Плоскость через точки $A,B,C$ &
+$\begin{vmatrix}x-x_A&y-y_A&z-z_A\\ x_B-x_A&y_B-y_A&z_B-z_A\\ x_C-x_A&y_C-y_A&z_C-z_A\end{vmatrix}=0$\\
+Направляющий вектор прямой $AB$ & $\ov{AB}\,(x_B-x_A;\ y_B-y_A;\ z_B-z_A)$\\
+Угол между прямыми & $\cos\varphi=\dfrac{|(\vec a_1,\vec a_2)|}{|\vec a_1|\,|\vec a_2|}$\\
+Угол между плоскостями & $\cos\varphi=\dfrac{|(\vec n_1,\vec n_2)|}{|\vec n_1|\,|\vec n_2|}$\\
+Угол между прямой и плоскостью & $\sin\varphi=\dfrac{|(\vec a,\vec n)|}{|\vec a|\,|\vec n|}$\\
+Расстояние от точки $M$ до плоскости & $\rho=\dfrac{|Ax_M+By_M+Cz_M+D|}{\sqrt{A^2+B^2+C^2}}$\\
+Расстояние от точки $A$ до прямой (через $M\in a$, направление $\vec a$) & $\rho=\dfrac{|[\vec a,\ov{AM}]|}{|\vec a|}$\\
+Расстояние между скрещивающимися прямыми & $\rho=\dfrac{|(\vec a_1,\vec a_2,\ov{M_1M_2})|}{|[\vec a_1,\vec a_2]|}$,\quad $M_1\in a_1$, $M_2\in a_2$\\
+Площадь треугольника $ABC$ & $S=\frac12\bigl|[\ov{AB},\ov{AC}]\bigr|$\\
+Объём тетраэдра $ABCD$ & $V=\frac16\bigl|(\ov{AB},\ov{AC},\ov{AD})\bigr|$\\
+\bottomrule
+\end{tabular}
+\caption{Основные формулы метода координат}
+\end{table}
+
+% ===================== 12 =====================
+\section{Объёмы многогранников}
+
+\begin{opr}
+\term{Объёмом} тела называют положительную величину, обладающую следующими свойствами:
+\begin{itemize}
+\item равные тела имеют равные объёмы;
+\item если тело составлено из нескольких тел, то его объём равен сумме объёмов этих тел;
+\item за единицу измерения объёма принимают единичный куб.
+\end{itemize}
+\end{opr}
+
+\sidefig[0.36]{
+\begin{fbx}{Объём через площади сечений}
+\[
+V=\int_a^b S(x)\,dx,
+\]
+где $S(x)$ — площадь сечения тела плоскостью, перпендикулярной оси $Ox$ и проходящей через точку с абсциссой $x$,
+$[a;b]$ — отрезок, на котором задано тело.
+\end{fbx}
+}{
+\begin{tikzpicture}
+  \draw[axis] (-0.4,0) -- (4.4,0) node[below] {$x$};
+  \fill[kviolet!10] (2,0) ellipse (1.6 and 0.85);
+  \draw[kviolet,line width=0.9pt] (2,0) ellipse (1.6 and 0.85);
+  \fill[korange!35] (2.2,0) ellipse (0.18 and 0.8);
+  \draw[korange,line width=1pt] (2.2,0) ellipse (0.18 and 0.8);
+  \node[korange,above] at (2.3,0.85) {$S(x)$};
+  \foreach \x/\l in {0.4/a,3.6/b,2.2/x} {\draw (\x,0.06) -- (\x,-0.06); \node[below,font=\footnotesize] at (\x,-0.06) {$\l$};}
+\end{tikzpicture}}
+
+\subsection{Объём призмы}
+
+\sidefig[0.3]{
+Направим ось $Ox$ перпендикулярно основаниям. Все сечения призмы, параллельные основанию, равны основанию:
+$S(x)=S_{\text{осн}}=\const$. Поэтому
+\[
+V=\int_0^h S(x)\,dx=S\int_0^h dx=Sh.
+\]
+}{
+\begin{tikzpicture}[scale=0.85]
+  \coordinate (A) at (0,0); \coordinate (B) at (1.8,0); \coordinate (C) at (2.5,0.6); \coordinate (D) at (0.6,0.7);
+  \coordinate (s) at (0.5,2.8);
+  \fill[korange!25] ($(A)!0.5!(A)+0.5*(s)$) -- ($(B)+0.5*(s)$) -- ($(C)+0.5*(s)$) -- ($(D)+0.5*(s)$) -- cycle;
+  \draw[korange,line width=0.9pt] ($(A)+0.5*(s)$) -- ($(B)+0.5*(s)$) -- ($(C)+0.5*(s)$) -- ($(D)+0.5*(s)$) -- cycle;
+  \node[korange,right] at ($(C)+0.5*(s)$) {$S(x)$};
+  \draw[line width=0.9pt] (A) -- (B) -- (C) ($(A)+(s)$) -- ($(B)+(s)$) -- ($(C)+(s)$) -- ($(D)+(s)$) -- cycle
+     (A) -- ($(A)+(s)$) (B) -- ($(B)+(s)$) (C) -- ($(C)+(s)$);
+  \draw[kgray,dashed] (A) -- (D) -- (C) (D) -- ($(D)+(s)$);
+  \draw[kviolet,line width=1pt] (1.2,0.35) -- (1.2,3.15) node[pos=0.25,right,font=\footnotesize] {$h$};
+  \fill[kviolet] (1.2,0.35) circle (1.2pt);
+\end{tikzpicture}}
+
+\begin{fbx}{Объём призмы}
+\[
+V_{\text{пр}}=S_{\text{осн}}\cdot h,\qquad h\ \text{— высота.}
+\]
+\end{fbx}
+
+\subsection{Объём пирамиды}
+
+\sidefig[0.36]{
+Поместим вершину пирамиды в начало координат, ось $Ox$ направим перпендикулярно основанию. Сечение на расстоянии $x$ от вершины
+подобно основанию с коэффициентом $k=x/h$, поэтому
+\[
+\frac{S(x)}{S_{\text{осн}}}=\Bigl(\frac xh\Bigr)^2,\qquad S(x)=S\cdot\frac{x^2}{h^2},
+\]
+\[
+V=\int_0^h\frac S{h^2}x^2\,dx=\frac S{h^2}\cdot\frac{h^3}3=\frac13Sh.
+\]
+}{
+\begin{tikzpicture}
+  \coordinate (O) at (0,0);
+  \coordinate (P1) at (3.4,1.3); \coordinate (P2) at (3.4,-0.9); \coordinate (P3) at (3.0,-0.3); \coordinate (P4) at (3.8,0.4);
+  \draw[axis] (-0.3,0) -- (4.6,0) node[below] {$x$};
+  \fill[kviolet!10] (P1) -- (P4) -- (P2) -- (P3) -- cycle;
+  \draw[line width=0.9pt] (O) -- (P1) (O) -- (P2) (O) -- (P3) (P1) -- (P3) -- (P2) -- (P4) -- (P1);
+  \draw[kgray,dashed] (O) -- (P4);
+  \fill[korange!35] ($(O)!0.45!(P1)$) -- ($(O)!0.45!(P4)$) -- ($(O)!0.45!(P2)$) -- ($(O)!0.45!(P3)$) -- cycle;
+  \draw[korange,line width=0.9pt] ($(O)!0.45!(P1)$) -- ($(O)!0.45!(P4)$) -- ($(O)!0.45!(P2)$) -- ($(O)!0.45!(P3)$) -- cycle;
+  \node[korange,above] at ($(O)!0.45!(P1)$) {$S(x)$};
+  \node[kviolet,above right] at (P1) {$S_{\text{осн}}$};
+  \fill (O) circle (1.4pt) node[above left] {$O$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt},kviolet] (0,-1.1) -- (3.4,-1.1) node[midway,below=4pt] {$h$};
+\end{tikzpicture}}
+
+\begin{fbx}{Объём пирамиды}
+\[
+V_{\text{пир}}=\frac13S_{\text{осн}}\cdot h.
+\]
+\end{fbx}
+
+\subsection{Объём усечённой пирамиды}
+
+\sidefig[0.36]{
+Достроим усечённую пирамиду до полной с вершиной $O$. Пусть меньшее основание (площадь $S_1$) находится на расстоянии $h_1$ от
+вершины, большее (площадь $S_2$) — на расстоянии $h_2$, высота $h=h_2-h_1$. Тогда $S(x)=S_2x^2/h_2^2$ и
+\[
+V=\int_{h_1}^{h_2}\frac{S_2}{h_2^2}x^2\,dx=\frac{S_2}{3h_2^2}\bigl(h_2^3-h_1^3\bigr)=\frac h3\cdot\frac{S_2}{h_2^2}\bigl(h_2^2+h_1h_2+h_1^2\bigr).
+\]
+Так как $S_1=S_2h_1^2/h_2^2$, то $S_2h_1/h_2=\sqrt{S_1S_2}$, откуда
+}{
+\begin{tikzpicture}
+  \coordinate (O) at (0,0);
+  \coordinate (P1) at (3.6,1.2); \coordinate (P2) at (3.6,-1.0); \coordinate (P3) at (3.2,-0.35); \coordinate (P4) at (4.0,0.45);
+  \draw[axis] (-0.3,0) -- (4.7,0) node[below] {$x$};
+  \draw[kgray,dashed] (O) -- ($(O)!0.45!(P1)$) (O) -- ($(O)!0.45!(P2)$) (O) -- ($(O)!0.45!(P3)$) (O) -- (P4);
+  \fill[kviolet!10] (P1) -- (P4) -- (P2) -- (P3) -- cycle;
+  \fill[korange!30] ($(O)!0.45!(P1)$) -- ($(O)!0.45!(P4)$) -- ($(O)!0.45!(P2)$) -- ($(O)!0.45!(P3)$) -- cycle;
+  \draw[line width=0.9pt] ($(O)!0.45!(P1)$) -- (P1) ($(O)!0.45!(P2)$) -- (P2) ($(O)!0.45!(P3)$) -- (P3)
+     (P1) -- (P3) -- (P2) -- (P4) -- (P1)
+     ($(O)!0.45!(P1)$) -- ($(O)!0.45!(P3)$) -- ($(O)!0.45!(P2)$);
+  \draw[kgray,dashed] ($(O)!0.45!(P1)$) -- ($(O)!0.45!(P4)$) -- ($(O)!0.45!(P2)$) ($(O)!0.45!(P4)$) -- (P4);
+  \node[korange,above] at ($(O)!0.45!(P1)$) {$S_1$};
+  \node[kviolet,above right] at (P1) {$S_2$};
+  \fill (O) circle (1.4pt) node[above left] {$O$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt},korange] (0,-1.15) -- (1.62,-1.15) node[midway,below=4pt] {$h_1$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt},kviolet] (1.62,-1.15) -- (3.6,-1.15) node[midway,below=4pt] {$h$};
+  \draw[decorate,decoration={brace,amplitude=4pt},kgray] (0,1.55) -- (3.6,1.55) node[midway,above=4pt] {$h_2$};
+\end{tikzpicture}}
+
+\begin{fbx}{Объём усечённой пирамиды}
+\[
+V=\frac13h\bigl(S_1+\sqrt{S_1S_2}+S_2\bigr).
+\]
+\end{fbx}
+
+\end{document}

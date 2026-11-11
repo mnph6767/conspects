@@ -1,0 +1,1009 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{konspekt}
+\renewcommand{\kheadleft}{Физика}
+\hypersetup{pdftitle={Конспект по физике},pdfauthor={Конспект теории}}
+\usepackage{circuitikz}
+\ctikzset{bipoles/length=0.9cm}
+\newcommand{\Ei}{\mathcal{E}}
+\newcommand{\odotB}[1]{\node[circle,draw,inner sep=1.1pt,line width=0.5pt] at #1 {}; \fill #1 circle (0.6pt);}
+\newcommand{\otimesB}[1]{\node[circle,draw,inner sep=1.1pt,line width=0.5pt] at #1 {};
+  \draw[line width=0.5pt] ($#1+(-0.07,-0.07)$) -- ($#1+(0.07,0.07)$) ($#1+(-0.07,0.07)$) -- ($#1+(0.07,-0.07)$);}
+\tikzset{wall/.style={pattern=north east lines,pattern color=kgray,draw=none}}
+
+\begin{document}
+
+% ===================== ОБЛОЖКА =====================
+\makecover{Физика}
+{\begin{tikzpicture}[scale=1.05]
+  % силовые линии витка (сечение)
+  \foreach \c in {1.1,1.35,1.75,2.35} {
+    \pgfmathsetmacro{\r}{sqrt(\c*\c-1)}
+    \draw[kviolet!80,line width=0.9pt,postaction={decorate},decoration={markings,mark=at position 0.25 with {\arrow{Stealth[length=2mm]}}}]
+      (\c,0) circle (\r);
+    \draw[kviolet!80,line width=0.9pt,postaction={decorate},decoration={markings,mark=at position 0.75 with {\arrow{Stealth[length=2mm]}}}]
+      (-\c,0) circle (\r);
+  }
+  \draw[kviolet!80,line width=0.9pt,->] (0,-2.6) -- (0,2.8);
+  \fill[white] (0,0) ellipse (1.05 and 0.28);
+  \draw[korange,line width=2.4pt] (0,0) ellipse (1 and 0.25);
+  \node[korange,font=\large] at (1.35,-0.45) {$I$};
+  % синусоида
+  \draw[korange,line width=1.6pt,domain=0:9.4,samples=150,shift={(-4.7,-3.7)}] plot (\x,{0.75*sin(\x*76.6)});
+  \draw[axis,shift={(-4.7,-3.7)}] (0,0) -- (9.8,0) node[below] {$t$};
+  % маятник
+  \begin{scope}[shift={(6.3,2.4)}]
+    \fill[wall] (-0.8,0) rectangle (0.8,0.2); \draw (-0.8,0) -- (0.8,0);
+    \draw[aux] (0,0) -- (0,-2.6);
+    \draw[line width=0.9pt] (0,0) -- (-70:2.6);
+    \fill[kviolet] (-70:2.6) circle (0.17);
+    \draw (0,-0.8) arc (-90:-70:0.8); \node[font=\footnotesize] at (0.18,-1.05) {$\alpha$};
+  \end{scope}
+\end{tikzpicture}}
+
+\maketoc
+
+% ===================== 1 =====================
+\section{Повторение 10 класса: термодинамика}
+
+\subsection{Уравнение состояния идеального газа}
+\[
+\kbox{pV=\nu RT,}
+\]
+где $p$ — давление, $V$ — объём, $\nu$ — количество вещества, $R=8{,}31$ Дж/(моль·К) — универсальная газовая постоянная,
+$T$ — абсолютная температура.
+
+\subsection{Изопроцессы}
+\begin{itemize}
+\item \textbf{Изобара} ($p=\const$): $V\propto T$ — на графике $V(T)$ прямая через начало координат.
+\item \textbf{Изохора} ($V=\const$): $p\propto T$ — на графике $p(T)$ прямая через начало координат.
+\item \textbf{Изотерма} ($T=\const$): $pV=\const$ — на графике $p(V)$ гипербола.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \foreach \s/\ya/\xa/\t in {0/V/T/{Изобара, $p=\const$},5.2/p/T/{Изохора, $V=\const$}} {
+    \begin{scope}[xshift=\s cm]
+      \draw[axis] (0,0) -- (3.2,0) node[below] {$\xa$};
+      \draw[axis] (0,0) -- (0,2.4) node[left] {$\ya$};
+      \draw[kviolet,line width=1.3pt] (0,0) -- (2.8,2.0);
+      \node[font=\footnotesize] at (1.6,-0.55) {\t};
+    \end{scope}}
+  \begin{scope}[xshift=10.4cm]
+    \draw[axis] (0,0) -- (3.2,0) node[below] {$V$};
+    \draw[axis] (0,0) -- (0,2.4) node[left] {$p$};
+    \draw[korange,line width=1.3pt,domain=0.3:2.9,samples=60] plot (\x,{0.6/\x});
+    \node[font=\footnotesize] at (1.6,-0.55) {Изотерма, $T=\const$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Графики изопроцессов}
+\end{figure}
+
+\subsection{Работа газа}
+Если газ при давлении $p$ двигает поршень площади $S$ на $\Delta x$, то
+\[
+A=F\Delta x=pS\Delta x=p\Delta V.
+\]
+При переменном давлении процесс разбивают на малые участки: $A=\sum p_i\Delta V_i$.
+
+\begin{kvb}{Геометрический смысл}
+Работа газа равна \textbf{площади под графиком} процесса в координатах $(V,p)$.
+\end{kvb}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=1.1]
+  \def\f(#1){0.7+3.2/(#1+0.2)-0.9*sin(deg(#1))}
+  \fill[kviolet!12,domain=1:4.5,samples=60] (1,0) -- plot (\x,{\f(\x)}) -- (4.5,0) -- cycle;
+  \fill[korange!45] (2.2,0) rectangle (2.45,{\f(2.3)});
+  \draw[kviolet,line width=1.3pt,domain=1:4.5,samples=60] plot (\x,{\f(\x)});
+  \draw[aux] (1,0) -- (1,{\f(1)}) (4.5,0) -- (4.5,{\f(4.5)});
+  \fill (1,{\f(1)}) circle (1.5pt) node[above] {$1$};
+  \fill (4.5,{\f(4.5)}) circle (1.5pt) node[above] {$2$};
+  \draw[axis] (0,0) -- (5.3,0) node[below] {$V$};
+  \draw[axis] (0,0) -- (0,3.4) node[left] {$p$};
+  \node at (3.5,0.6) {$A_{1\to2}$};
+  \node[korange,below,font=\footnotesize] at (2.33,0) {$\Delta V$};
+\end{tikzpicture}
+\caption{Работа газа — площадь под графиком $p(V)$}
+\end{figure}
+
+\subsection{Первое начало термодинамики}
+\[
+\kbox{Q=A+\Delta U,\qquad U=\frac i2\,\nu RT}
+\]
+Теплота $Q$, переданная газу, идёт на совершение газом работы $A$ и на изменение внутренней энергии $\Delta U$.
+Внутренняя энергия идеального газа — это суммарная кинетическая энергия молекул, $i$ — число степеней свободы молекулы:
+\begin{itemize}
+\item $i=3$ — одноатомный газ;
+\item $i=5$ — двухатомный газ (а также линейные молекулы, например CO$_2$);
+\item $i=6$ — молекулы из трёх и более атомов.
+\end{itemize}
+
+\subsection{Тепловые двигатели}
+Рабочее тело получает от нагревателя теплоту $Q_1$, совершает работу $A$ и отдаёт холодильнику теплоту $Q_2$:
+\[
+Q_1=A+Q_2.
+\]
+\[
+\kbox{\eta=\frac A{Q_1}=\frac A{A+Q_2}=\frac{Q_1-Q_2}{Q_1}}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[box/.style={draw,line width=0.9pt,rounded corners=2pt,minimum width=3.6cm,minimum height=0.8cm,font=\sffamily}]
+  \node[box,draw=korange,fill=korange!12] (H) at (0,2.6) {Нагреватель, $T_1$};
+  \node[box,draw=kviolet,fill=kviolet!10,ellipse,minimum width=3.4cm] (W) at (0,1.1) {Рабочее тело};
+  \node[box,draw=kviolet,fill=white] (C) at (0,-0.4) {Холодильник, $T_2$};
+  \draw[->,korange,line width=1.1pt] (H) -- (W) node[midway,right] {$Q_1$};
+  \draw[->,kviolet,line width=1.1pt] (W) -- (C) node[midway,right] {$Q_2$};
+  \draw[->,black,line width=1.1pt] (W.east) -- ++(1.8,0) node[right] {$A$};
+\end{tikzpicture}
+\caption{Схема теплового двигателя}
+\end{figure}
+
+\subsection{Цикл Карно. Адиабата и политропа}
+Цикл Карно состоит из двух изотерм ($T_1$ — нагреватель, $T_2$ — холодильник) и двух адиабат ($Q=0$).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=1.25,yscale=1.0]
+  % изотермы p=c/V, адиабаты p=k/V^2 (gamma=2 для наглядности)
+  \def\c{4.0}\def\cc{1.6}
+  \pgfmathsetmacro{\Va}{1} \pgfmathsetmacro{\Vb}{1.8}
+  \pgfmathsetmacro{\Vc}{\Vb*\c/\cc} \pgfmathsetmacro{\Vd}{\Va*\c/\cc}
+  \pgfmathsetmacro{\ka}{\c*\Vb} \pgfmathsetmacro{\kb}{\c*\Va}
+  \fill[kviolet!8] plot[domain=\Va:\Vb,samples=40] (\x,{\c/\x}) -- plot[domain=\Vb:\Vc,samples=40] (\x,{\ka/\x^2})
+     -- plot[domain=\Vc:\Vd,samples=40] (\x,{\cc/\x}) -- plot[domain=\Vd:\Va,samples=40] (\x,{\kb/\x^2}) -- cycle;
+  \draw[korange,line width=1.4pt,domain=\Va:\Vb,samples=40,postaction={decorate},decoration={markings,mark=at position 0.55 with {\arrow{Stealth}}}] plot (\x,{\c/\x});
+  \draw[kviolet,line width=1.4pt,domain=\Vb:\Vc,samples=40,postaction={decorate},decoration={markings,mark=at position 0.45 with {\arrow{Stealth}}}] plot (\x,{\ka/\x^2});
+  \draw[kviolet!60!black,line width=1.4pt,domain=\Vc:\Vd,samples=40,postaction={decorate},decoration={markings,mark=at position 0.5 with {\arrow{Stealth}}}] plot (\x,{\cc/\x});
+  \draw[kviolet,line width=1.4pt,domain=\Vd:\Va,samples=40,postaction={decorate},decoration={markings,mark=at position 0.5 with {\arrow{Stealth}}}] plot (\x,{\kb/\x^2});
+  \fill (\Va,{\c/\Va}) circle (1.6pt) node[above left] {$1$};
+  \fill (\Vb,{\c/\Vb}) circle (1.6pt) node[above right] {$2$};
+  \fill (\Vc,{\cc/\Vc}) circle (1.6pt) node[right] {$3$};
+  \fill (\Vd,{\cc/\Vd}) circle (1.6pt) node[below left] {$4$};
+  \node[korange,font=\footnotesize,right] at (1.45,3.0) {изотерма $T_1$: получено $Q_1$};
+  \node[kviolet,font=\footnotesize,right] at (3.0,1.25) {адиабата, $Q=0$};
+  \node[kviolet,font=\footnotesize,left] at (1.3,1.2) {адиабата, $Q=0$};
+  \node[kviolet!60!black,font=\footnotesize] at (3.0,-0.35) {изотерма $T_2$: отдано $Q_2$};
+  \draw[axis] (0,0) -- (5.2,0) node[below] {$V$};
+  \draw[axis] (0,0) -- (0,4.5) node[left] {$p$};
+\end{tikzpicture}
+\caption{Цикл Карно в координатах $(V,p)$}
+\end{figure}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Адиабата} (нет теплообмена, $Q=0$):
+\[
+pV^\gamma=\const,\qquad \gamma=\frac{C_p}{C_V}>1.
+\]
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Политропа} (теплоёмкость $C$ постоянна):
+\[
+pV^n=\const,\qquad n=\frac{C-C_p}{C-C_V}.
+\]
+\end{minipage}
+
+\[
+\kbox{\eta_{\text{Карно}}=1-\frac{T_2}{T_1}}\qquad(T_1\text{ — нагреватель, }T_2\text{ — холодильник})
+\]
+КПД цикла Карно — \akc{максимально возможный} для тепловой машины, работающей между этими температурами.
+
+\subsection{Поверхностное натяжение}
+\begin{itemize}
+\item $\sigma$ — \term{коэффициент поверхностного натяжения}.
+\item Сила поверхностного натяжения, действующая на границу длины $l$: $F=\sigma l$ (для окружности радиуса $R$: $l=2\pi R$).
+\item Поверхностная энергия: $E=\sigma S$.
+\item $\theta$ — \term{краевой угол} (угол смачивания) между поверхностью твёрдого тела и касательной к поверхности жидкости.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  % смачивание (theta = 50)
+  \begin{scope}[scale=1.25]
+  \fill[wall] (-1.8,-0.2) rectangle (1.8,0); \draw[line width=0.8pt] (-1.8,0) -- (1.8,0);
+  \fill[kviolet!15] (1.3,0) arc (40:140:1.70) -- cycle;
+  \draw[kviolet,line width=1pt] (1.3,0) arc (40:140:1.70);
+  \draw[line width=0.8pt] (1.3,0) -- ++(130:1.0);
+  \draw[korange,line width=0.9pt] (0.9,0) arc (180:130:0.4);
+  \node[korange,font=\footnotesize] at (0.7,0.24) {$\theta$};
+  \node[font=\footnotesize] at (0,-0.5) {смачивание, $\theta<90^\circ$};
+  \end{scope}
+  % несмачивание
+  \begin{scope}[xshift=5.4cm,scale=1.25]
+  \fill[wall] (-1.8,-0.2) rectangle (1.8,0); \draw[line width=0.8pt] (-1.8,0) -- (1.8,0);
+  \fill[kviolet!15] (0,0.62) circle (0.75);
+  \draw[kviolet,line width=1pt] (0,0.62) circle (0.75);
+  \coordinate (T) at ({0.75*sin(34)},{0.62-0.75*cos(34)});
+  \draw[line width=0.8pt] (T) -- ++(34:1.3);
+  \draw[korange,line width=0.9pt] ($(T)+(-0.4,0)$) arc (180:34:0.4);
+  \node[korange,font=\footnotesize] at ($(T)+(-0.05,0.55)$) {$\theta$};
+  \node[font=\footnotesize] at (0,-0.5) {несмачивание, $\theta>90^\circ$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Краевой угол $\theta$}
+\end{figure}
+
+\begin{kvb}{Формула Лапласа}
+Добавочное давление под искривлённой поверхностью жидкости с главными радиусами кривизны $R_1$, $R_2$:
+\[
+\Delta p=\sigma\Bigl(\pm\frac1{R_1}\pm\frac1{R_2}\Bigr).
+\]
+Для сферической капли радиуса $R$: $\Delta p=\dfrac{2\sigma}R$.
+\end{kvb}
+
+% ===================== 2 =====================
+\section{Магнитное поле}
+
+\subsection{Индукция магнитного поля}
+Основная характеристика магнитного поля — вектор \term{магнитной индукции} $\vec B$.
+\begin{itemize}
+\item В СИ: $[B]=\text{Тл}$ (тесла); в СГС: $[B]=\text{Гс}$ (гаусс), $1\ \text{Гс}=10^{-4}\ \text{Тл}$.
+\item Магнитное поле действует \akc{только на движущиеся} заряженные частицы (и, значит, на токи).
+\end{itemize}
+
+\subsection{Взаимодействие токов}
+Параллельные проводники с \textbf{сонаправленными} токами притягиваются, с \textbf{противоположно направленными} — отталкиваются.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \foreach \y in {0,1.4} {\draw[line width=1.1pt] (0,\y) -- (3.4,\y); \draw[->,line width=1.1pt] (0.4,\y) -- (1.0,\y) node[above] {$I$};}
+  \draw[veco] (2.2,0.05) -- (2.2,0.6) node[right,korange] {$\vec F$};
+  \draw[veco] (2.2,1.35) -- (2.2,0.8);
+  \node[font=\footnotesize] at (1.7,-0.55) {притягиваются};
+  \begin{scope}[xshift=5.5cm]
+  \foreach \y in {0,1.4} \draw[line width=1.1pt] (0,\y) -- (3.4,\y);
+  \draw[->,line width=1.1pt] (0.4,1.4) -- (1.0,1.4) node[above] {$I$};
+  \draw[->,line width=1.1pt] (1.0,0) -- (0.4,0) node[below] {$I$};
+  \draw[veco] (2.2,1.45) -- (2.2,2.0) node[right,korange] {$\vec F$};
+  \draw[veco] (2.2,-0.05) -- (2.2,-0.6) node[right,korange] {$\vec F$};
+  \node[font=\footnotesize] at (1.7,-0.95) {отталкиваются};
+  \end{scope}
+\end{tikzpicture}
+\caption{Взаимодействие параллельных токов}
+\end{figure}
+
+\subsection{Сила Лоренца}
+На заряд $q$, движущийся со скоростью $\vec v$ в магнитном поле $\vec B$, действует \term{сила Лоренца}:
+\[
+\kbox{\vec F_{\text{Л}}=q[\vec v\times\vec B],\qquad |\vec F_{\text{Л}}|=|q|\,vB\sin\alpha,}
+\]
+где $\alpha$ — угол между $\vec v$ и $\vec B$. Направление определяется по правилу векторного произведения (правилу левой руки
+для положительного заряда). Если присутствует ещё и электрическое поле $\vec E$:
+\[
+\vec F=q[\vec v\times\vec B]+q\vec E.
+\]
+
+\subsection{Сила Ампера}
+На проводник с током $I$ длины $l$ в магнитном поле действует \term{сила Ампера}:
+\[
+\kbox{\vec F_{\text{А}}=I[\vec l\times\vec B],\qquad|\vec F_{\text{А}}|=BIl\sin\alpha,}
+\]
+где $\vec l$ направлен по току.
+
+\textbf{Связь с силой Лоренца.} Пусть $n$ — концентрация носителей заряда $e$, $v$ — их скорость, $S$ — сечение проводника.
+Тогда сила тока $I=evnS$, а число носителей в куске длины $l$: $N=nV=nSl$. Сила Ампера — сумма сил Лоренца, действующих на все носители:
+\[
+F_{\text{А}}=N\cdot F_{\text{Л}}=nSl\cdot evB=(evnS)\,lB=BIl.
+\]
+\emph{Порядок величины:} при $l=1$~м, $I=1$~А, $B=10^{-5}$~Тл (близко к полю Земли) $F_{\text{А}}=10^{-5}$~Н.
+
+\subsection{Магнитные свойства вещества}
+\begin{kvb}{Домены}
+Области вещества (ферромагнетика) с сонаправленными магнитными моментами электронов.
+\end{kvb}
+\begin{kvb}{Температура Кюри}
+Температура, при которой ферромагнетик переходит из магнитного (ферромагнитного) состояния в немагнитное.
+\end{kvb}
+
+\subsection{Силовые линии и поток поля}
+Силовые линии магнитного поля \akc{замкнуты} (у них нет начала и конца) — магнитных зарядов не существует.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+  \foreach \c in {1.12,1.4,1.9,2.8} {
+    \pgfmathsetmacro{\r}{sqrt(\c*\c-1)}
+    \draw[kviolet,line width=0.8pt,postaction={decorate},decoration={markings,mark=at position 0.25 with {\arrow{Stealth[length=2mm]}}}] (\c,0) circle (\r);
+    \draw[kviolet,line width=0.8pt,postaction={decorate},decoration={markings,mark=at position 0.75 with {\arrow{Stealth[length=2mm]}}}] (-\c,0) circle (\r);
+  }
+  \draw[kviolet,line width=0.8pt,->] (0,-2.9) -- (0,3.0);
+  \fill[white] (0,0) ellipse (1.08 and 0.3);
+  \draw[korange,line width=2pt] (0,0) ellipse (1 and 0.25);
+  \draw[->,korange,line width=1pt] (0.3,-0.24) -- (0.5,-0.22);
+  \node[korange] at (0.45,-0.6) {$I$};
+\end{tikzpicture}
+\caption{Силовые линии магнитного поля витка с током}
+\end{figure}
+
+\term{Поток} векторного поля через поверхность:
+\[
+\Phi_E=\int(\vec E,d\vec S),\qquad \Phi_B=\int(\vec B,d\vec S).
+\]
+
+% ===================== 3 =====================
+\section{Движение заряженной частицы в магнитном поле}
+
+\subsection{Работа силы Лоренца}
+Сила Лоренца всегда перпендикулярна скорости, поэтому
+\[
+A=(\vec F,\Delta\vec x)=F\Delta x\cos90^\circ=0.
+\]
+Магнитное поле \akc{не меняет модуль скорости} (и кинетическую энергию) частицы — только направление движения.
+
+\subsection{Движение по окружности (\texorpdfstring{$\protect\vec v\perp\protect\vec B$}{v ⟂ B})}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \foreach \x in {-2.2,-1.1,...,2.2} \foreach \y in {-2.2,-1.1,...,2.2} {\otimesB{(\x,\y)}}
+  \fill[white] (0,0) circle (1.7);
+  \draw[kviolet,line width=1.2pt,postaction={decorate},decoration={markings,mark=at position 0.62 with {\arrow{Stealth}}}] (0,0) circle (1.5);
+  \fill (0,0) circle (1.4pt) node[below right] {$O$};
+  \fill[korange] (-1.5,0) circle (3pt);
+  \node[left,font=\footnotesize] at (-1.6,0.3) {$m,q$};
+  \draw[vecv] (-1.5,0) -- (-1.5,1.3) node[left,kviolet] {$\vec v$};
+  \draw[veco] (-1.5,0) -- (-0.4,0) node[above,korange] {$\vec F_{\text{Л}}$};
+  \draw[aux] (0,0) -- (-1.06,-1.06) node[midway,below right,black] {$R$};
+  \node at (2.6,2.6) {$\vec B$};
+\end{tikzpicture}
+\caption{Положительный заряд в однородном поле $\vec B$, направленном от нас}
+\end{figure}
+
+По второму закону Ньютона сила Лоренца сообщает частице центростремительное ускорение $a=v^2/R$:
+\[
+qvB=m\frac{v^2}R=m\omega^2R.
+\]
+\[
+\kbox{R=\frac{mv}{qB}=\frac v{\gamma B},\qquad T=\frac{2\pi R}v=\frac{2\pi m}{qB},}
+\]
+где $\gamma=q/m$ — \term{удельный заряд} частицы. Период обращения \akc{не зависит от скорости}.
+
+Если частица предварительно разогнана из покоя разностью потенциалов $U$, то $qU=\dfrac{mv^2}2$, откуда
+\[
+v=\sqrt{2\gamma U},\qquad R=\frac{\sqrt{2\gamma U}}{\gamma B}=\frac1B\sqrt{\frac{2mU}q}.
+\]
+\emph{Порядок величины:} электрон ($e=1{,}6\cdot10^{-19}$~Кл, $m_e=9{,}1\cdot10^{-31}$~кг), $U\approx100$~В, $B\approx10^{-3}$~Тл —
+радиус около $3$~см.
+
+\subsection{Движение по винтовой линии}
+Если скорость направлена под углом $\alpha$ к $\vec B$, разложим её на две составляющие:
+\begin{itemize}
+\item $v_\perp=v\sin\alpha$ — даёт вращение по окружности в плоскости, перпендикулярной $\vec B$;
+\item $v_\parallel=v\cos\alpha$ — равномерное движение вдоль $\vec B$ (вдоль поля сила не действует).
+\end{itemize}
+\[
+\kbox{R=\frac{mv\sin\alpha}{qB},\qquad T=\frac{2\pi m}{qB},\qquad h=v_\parallel T=\frac{2\pi mv\cos\alpha}{qB},}
+\]
+где $h$ — \term{шаг винтовой линии}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=1.0]
+  \draw[axis,kgray] (-0.6,0) -- (8.6,0) node[right,black] {$\vec B$};
+  \draw[kviolet,line width=1.5pt,domain=0:3,samples=240,smooth]
+     plot ({2.2*\x+0.95*(1-cos(\x*360))}, {1.1*sin(\x*360)});
+  \draw[veco] (0,0) -- (0.85,1.0) node[above,korange] {$\vec v$};
+  \draw (0.5,0) arc (0:50:0.5); \node[font=\footnotesize] at (0.72,0.25) {$\alpha$};
+  \fill[korange] (0,0) circle (2pt);
+  \draw[aux] (0,0) -- (0,-1.6) (2.2,0) -- (2.2,-1.6);
+  \draw[<->] (0,-1.45) -- (2.2,-1.45) node[midway,below] {$h$};
+  \draw[aux] (7.0,1.1) -- (7.9,1.1);
+  \draw[<->] (7.7,0) -- (7.7,1.1) node[midway,right] {$R$};
+\end{tikzpicture}
+\caption{Винтовая линия: радиус $R$ и шаг $h$}
+\end{figure}
+
+\subsection{Дрейф на границе двух полей}
+Пусть частица движется вблизи границы двух областей с параллельными полями $B_1>B_2$. В каждой области она описывает
+полуокружность своего радиуса $R_i=\dfrac{mv}{qB_i}$ за полупериод $T_i/2=\dfrac{\pi m}{qB_i}$. За один «цикл» частица смещается
+вдоль границы на $\Delta x=2(R_2-R_1)$ — возникает \term{дрейф} со средней скоростью
+\[
+\kbox{v_{\text{др}}=\frac{2(R_2-R_1)}{\frac{T_1}2+\frac{T_2}2}=\frac{2v}\pi\cdot\frac{B_1-B_2}{B_1+B_2}.}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.15]
+  \fill[kviolet!6] (-0.6,0) rectangle (8.2,1.6);
+  \fill[korange!10] (-0.6,-1.1) rectangle (8.2,0);
+  \draw[line width=0.8pt] (-0.6,0) -- (8.2,0);
+  \node at (7.8,1.3) {$B_2$}; \node at (7.8,-0.8) {$B_1$};
+  \odotB{(-0.3,1.3)} \odotB{(7.3,1.3)} \odotB{(-0.3,-0.8)} \odotB{(7.3,-0.8)}
+  \foreach \k in {0,1,2} {
+    \pgfmathsetmacro{\s}{1.1*\k}
+    \draw[kviolet,line width=1.3pt,postaction={decorate},decoration={markings,mark=at position 0.5 with {\arrow{Stealth}}}]
+      (\s,0) arc (180:0:1);
+    \draw[korange,line width=1.3pt] ({\s+2},0) arc (0:-180:0.45);
+  }
+  \draw[veco] (0,0) -- (0,0.7) node[left,korange] {$\vec v$};
+  \draw[<->,kviolet] (0,-0.9) -- (1.1,-0.9) node[midway,below,font=\footnotesize] {$2(R_2-R_1)$};
+  \draw[->,line width=1pt] (5.0,-0.75) -- (6.2,-0.75) node[right,font=\footnotesize] {дрейф};
+\end{tikzpicture}
+\caption{Дрейф частицы вдоль границы областей с разным полем}
+\end{figure}
+
+% ===================== 4 =====================
+\section{Электромагнитная индукция}
+
+\subsection{Магнитный поток}
+\[
+\kbox{\Phi=\int(\vec B,d\vec S);\qquad\text{для однородного поля: }\Phi=BS\cos\alpha.}
+\]
+Единица: $[\Phi]=\text{Вб}$ (вебер); $1\ \text{Вб}=1\ \text{Тл}\cdot\text{м}^2=1\ \text{В}\cdot\text{с}$.
+
+\subsection{Закон Фарадея и правило Ленца}
+При изменении магнитного потока через замкнутый контур в нём возникает \term{ЭДС индукции}:
+\[
+\kbox{\Ei_{\text{инд}}=-\frac{\Delta\Phi}{\Delta t}}\quad\Bigl(\text{для катушки из $N$ витков: }\Ei_{\text{инд}}=-N\frac{\Delta\Phi}{\Delta t}\Bigr),\qquad
+I_{\text{инд}}=\frac{\Ei_{\text{инд}}}R.
+\]
+
+\begin{kob}{Правило Ленца}
+Индукционный ток направлен так, что его магнитное поле $\vec B_{\text{инд}}$ \textbf{компенсирует изменение} внешнего магнитного
+потока, которое этот ток вызвало (знак «минус» в законе Фарадея).
+\end{kob}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[kviolet,line width=1.6pt] (0,0) circle (1.2);
+  \foreach \p in {(-0.45,0.35),(0.45,0.35),(-0.45,-0.35),(0.45,-0.35)} {\odotB{\p}}
+  \node[above,font=\footnotesize] at (0.85,0.25) {$\vec B$};
+  \draw[->,korange,line width=1.2pt] (1.2,-0.05) -- (1.2,0.25);
+  \node[korange,right] at (1.25,0.15) {$I$};
+  \node[font=\footnotesize,align=center] at (0,-1.85) {$B$ убывает $\Rightarrow$\\ $\vec B_{\text{инд}}\upuparrows\vec B$};
+  \begin{scope}[xshift=3.3cm,yshift=-1cm]
+    \draw[axis] (0,0) -- (3.4,0) node[below] {$t$};
+    \draw[axis] (0,0) -- (0,2.4) node[left] {$B$};
+    \draw[kviolet,line width=1.3pt] (0,1.9) -- (2.6,0.2);
+    \node[font=\footnotesize,right] at (0.7,1.85) {$B=B_0(1-\alpha t)$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Ток индукции в кольце при убывании поля}
+\end{figure}
+
+\textbf{Сверхпроводящий контур.} В сверхпроводнике $R=0$, поэтому $\Ei=IR=0$, то есть
+\[
+\frac{\Delta\Phi}{\Delta t}=0\quad\Longrightarrow\quad\Phi=\const:
+\]
+сверхпроводящий контур «сохраняет» магнитный поток через себя.
+
+\subsection{Заряд, прошедший через контур}
+Из $I=\dfrac{\Ei}R=-\dfrac1R\dfrac{\Delta\Phi}{\Delta t}$ и $\Delta q=I\Delta t$:
+\[
+\kbox{q=\frac{|\Delta\Phi|}R=\frac{S\,|\Delta B|}R}
+\]
+Прошедший заряд зависит \akc{только от полного изменения потока} и не зависит от того, как именно (быстро или медленно, линейно или нет)
+менялось поле.
+
+\subsection{ЭДС индукции в движущемся проводнике}
+Проводник длины $l$ движется со скоростью $v$ перпендикулярно полю $B$. За время $\Delta t$ площадь контура меняется на $\Delta S=lv\Delta t$, поэтому
+\[
+\kbox{|\Ei|=\frac{\Delta\Phi}{\Delta t}=B\frac{\Delta S}{\Delta t}=Blv.}
+\]
+Причина ЭДС — сила Лоренца, действующая на свободные заряды проводника. В системе отсчёта, связанной с проводником, заряды покоятся,
+и на них действует электрическое поле $\vec E'=[\vec v\times\vec B]$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[line width=1.2pt] (4.6,0) -- (0,0) -- (0,1.8) -- (4.6,1.8);
+  \foreach \x in {0.6,1.4,2.2,3.8} \foreach \y in {0.45,1.35} {\odotB{(\x,\y)}}
+  \node at (4.9,2.15) {$\vec B$};
+  \draw[kviolet,line width=2.4pt] (3.0,-0.25) -- (3.0,2.05);
+  \draw[veco] (3.0,0.9) -- (4.2,0.9) node[right,korange] {$\vec v$};
+  \draw[->,kviolet,line width=1pt] (2.75,0.5) -- (2.75,1.3) node[midway,left,kviolet] {$I$};
+  \draw[->,line width=1.1pt] (3.0,0.25) -- (2.0,0.25) node[left,font=\footnotesize] {$\vec F_{\text{А}}$};
+  \draw[<->] (-0.35,0) -- (-0.35,1.8) node[midway,left] {$l$};
+\end{tikzpicture}
+\caption{Перемычка на рельсах в магнитном поле: $\Ei=Blv$, сила Ампера тормозит перемычку}
+\end{figure}
+
+\subsection{Эффект Холла}
+Пластина толщины $h$ с током $I$ помещена в поле $\vec B$, перпендикулярное току. Сила Лоренца $\vec F_{\text{Л}}=q[\vec v\times\vec B]$
+отклоняет носители к одной из граней — грани заряжаются, внутри возникает поперечное электрическое поле $E$. Оно растёт, пока
+электрическая сила не скомпенсирует силу Лоренца:
+\[
+qE=qvB\quad\Longrightarrow\quad E=vB.
+\]
+\[
+\kbox{U_{\text{Х}}=Eh=vBh}\qquad\text{(холловское напряжение)}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \fill[kviolet!8] (0,0) rectangle (6,1.8);
+  \draw[line width=1pt] (0,0) rectangle (6,1.8);
+  \foreach \x in {0.8,1.6,...,5.6} {\node[kviolet,font=\bfseries] at (\x,1.55) {$-$}; \node[korange,font=\bfseries] at (\x,0.22) {$+$};}
+  \draw[->,line width=1.2pt] (-1.2,0.9) -- (0,0.9) node[pos=0.3,above] {$I$};
+  \draw[->,line width=1.2pt] (6,0.9) -- (7.0,0.9);
+  \draw[veco] (2.2,0.35) -- (2.2,1.35) node[pos=0.25,right,korange] {$\vec E$};
+  \draw[vecv] (4.0,0.9) -- (4.0,1.4) node[right,kviolet] {$\vec F_{\text{Л}}$};
+  \fill[kviolet] (4.0,0.9) circle (2pt);
+  \draw[<->] (6.35,0) -- (6.35,1.8) node[pos=0.25,right] {$h$};
+  \otimesB{(7.0,1.55)} \node[right] at (7.15,1.55) {$\vec B$};
+\end{tikzpicture}
+\caption{Эффект Холла (носители заряда — электроны)}
+\end{figure}
+
+\emph{Порядок величины:} $v\sim10^{-3}$~м/с, $B\sim10^{-2}$~Тл, $h\sim10^{-1}$~м — $U_{\text{Х}}\sim10^{-6}$~В.
+
+\subsection{Рамка с током в магнитном поле. Магнитный момент}
+\begin{opr}[магнитный момент]
+\term{Магнитный момент} плоского контура с током $I$ и площадью $S$: $\vec p_m=IS\,\vec n$, где нормаль $\vec n$ связана с направлением
+тока правилом буравчика.
+\end{opr}
+
+На рамку в однородном поле действует момент сил
+\[
+\kbox{M=p_mB\sin\alpha=ISB\sin\alpha.}
+\]
+Рамка поворачивается так, чтобы $\vec p_m\upuparrows\vec B$ — это положение \akc{устойчивого равновесия} ($M=0$).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis,kgray] (-2.2,0) -- (3.0,0) node[right,black] {$\vec B$};
+  \foreach \y in {-1.6,1.6} \draw[->,kgray,line width=0.5pt] (-2.2,\y) -- (3.0,\y);
+  \draw[kviolet,line width=2.2pt] (-0.55,-1.3) -- (0.55,1.3);
+  \fill[kviolet] (0.55,1.3) circle (2.5pt); \fill[kviolet] (-0.55,-1.3) circle (2.5pt);
+  \node[above left,font=\footnotesize] at (0.55,1.3) {$\odot$};
+  \node[below right,font=\footnotesize] at (-0.55,-1.3) {$\otimes$};
+  \draw[veco] (0.55,1.3) -- (0.55,2.3) node[above,korange] {$\vec F$};
+  \draw[veco] (-0.55,-1.3) -- (-0.55,-2.3) node[below,korange] {$\vec F$};
+  \draw[vecv] (0,0) -- ({1.6*cos(-23)},{1.6*sin(-23)}) node[right,kviolet] {$\vec p_m$};
+  \draw (0.8,0) arc (0:-23:0.8); \node[font=\footnotesize] at (1.05,-0.18) {$\alpha$};
+\end{tikzpicture}
+\caption{Момент сил, действующий на рамку с током (вид сбоку)}
+\end{figure}
+
+\subsection{Проводник, падающий по вертикальным рельсам}
+Перемычка массы $m$ и длины $l$ скользит без трения по вертикальным рельсам, замкнутым резистором $R$; поле $\vec B$
+перпендикулярно плоскости рельсов.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[line width=1.2pt] (0,0) -- (0,3) (2,0) -- (2,3);
+  \draw[line width=1pt] (0,3) -- (0.6,3); \draw[line width=1pt] (1.4,3) -- (2,3);
+  \draw[line width=1pt,fill=white] (0.6,2.82) rectangle (1.4,3.18); \node[above] at (1,3.2) {$R$};
+  \draw[kviolet,line width=2.4pt] (-0.2,1.6) -- (2.2,1.6); \node[right] at (2.25,1.75) {$m$};
+  \draw[veco] (1,1.6) -- (1,0.8) node[right,korange] {$\vec g$};
+  \foreach \p in {(0.5,0.5),(1.5,0.5),(0.5,2.3),(1.5,2.3)} {\odotB{\p}}
+  \node[left] at (-0.1,0.5) {$\vec B$};
+  \draw[<->] (0,-0.3) -- (2,-0.3) node[midway,below] {$l$};
+  \begin{scope}[xshift=4.2cm]
+    \draw[axis] (0,0) -- (5,0) node[below] {$t$};
+    \draw[axis] (0,0) -- (0,3) node[left] {$v$};
+    \draw[aux] (0,2.2) -- (4.8,2.2) node[above,black,font=\footnotesize] {$v_{\text{уст}}$};
+    \draw[kgray,line width=0.6pt] (0,0) -- (1.2,2.2);
+    \draw[aux] (1.2,0) -- (1.2,2.2);
+    \node[below] at (1.2,0) {$\tau$};
+    \draw[kviolet,line width=1.4pt,domain=0:4.7,samples=60] plot (\x,{2.2*(1-exp(-\x/1.2))});
+  \end{scope}
+\end{tikzpicture}
+\caption{Перемычка на вертикальных рельсах и график её скорости}
+\end{figure}
+
+\begin{itemize}
+\item ЭДС в перемычке: $\Ei=Blv$; ток: $I=\dfrac{Blv}R$; сила Ампера: $F_{\text{А}}=BIl=\dfrac{B^2l^2v}R$.
+\item Второй закон Ньютона: $m\dfrac{dv}{dt}=mg-\dfrac{B^2l^2}Rv$.
+\item При установившемся движении $\dfrac{dv}{dt}=0$, $mg=F_{\text{А}}$:
+\end{itemize}
+\[
+\kbox{v_{\text{уст}}=\frac{mgR}{B^2l^2},\qquad v(t)=v_{\text{уст}}\bigl(1-e^{-t/\tau}\bigr),\qquad\tau=\frac{mR}{B^2l^2}.}
+\]
+Время $\tau$ — характерное время установления скорости (касательная к графику в начале пересекает уровень $v_{\text{уст}}$ при $t=\tau$).
+
+\textbf{Устойчивость.} Если скорость случайно увеличится на $\Delta v$, сила Ампера $\dfrac{B^2l^2}R(v+\Delta v)$ превысит $mg$ — появится
+добавочная сила, стремящаяся скомпенсировать $\Delta v$. Значит, режим с постоянной скоростью — устойчивое равновесие.
+
+\textbf{Превращения энергии.} Работа силы тяжести переходит в кинетическую энергию перемычки, в теплоту, выделяющуюся на резисторе,
+и в энергию магнитного поля тока. В установившемся режиме вся мощность силы тяжести выделяется в виде тепла: $mgv=I^2R$.
+
+\subsection{Виды равновесия}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[line width=1.2pt,kviolet] (-1.3,0.9) .. controls (-0.6,-0.25) and (0.6,-0.25) .. (1.3,0.9);
+  \fill[korange] (0,0.06) circle (0.18);
+  \node[font=\footnotesize] at (0,-0.6) {устойчивое};
+  \begin{scope}[xshift=4cm]
+    \draw[line width=1.2pt,kviolet] (-1.3,-0.12) -- (1.3,-0.12);
+    \fill[korange] (0,0.06) circle (0.18);
+    \node[font=\footnotesize] at (0,-0.6) {безразличное};
+  \end{scope}
+  \begin{scope}[xshift=8cm]
+    \draw[line width=1.2pt,kviolet] (-1.3,-0.4) .. controls (-0.6,0.75) and (0.6,0.75) .. (1.3,-0.4);
+    \fill[korange] (0,0.62) circle (0.18);
+    \node[font=\footnotesize] at (0,-0.6) {неустойчивое};
+  \end{scope}
+\end{tikzpicture}
+\caption{Устойчивое, безразличное и неустойчивое равновесие}
+\end{figure}
+
+При малом отклонении от \textbf{устойчивого} положения равновесия возникает сила, возвращающая систему обратно; от \textbf{неустойчивого} —
+сила, уводящая её дальше; в \textbf{безразличном} — сила не возникает.
+
+% ===================== 5 =====================
+\section{Закон Био–Савара–Лапласа}
+
+Элемент проводника $d\vec l$ с током $I$ создаёт в точке, заданной радиус-вектором $\vec r$, магнитное поле
+\[
+\kbox{d\vec B=\frac{\mu_0}{4\pi}\cdot\frac{I\,[d\vec l\times\vec r]}{r^3},\qquad\mu_0=4\pi\cdot10^{-7}\ \text{Гн/м},}
+\]
+$\mu_0$ — \term{магнитная постоянная}. На продолжении элемента тока (на его оси) $d\vec B=0$. Полное поле находят суммированием
+(интегрированием) вкладов всех элементов: $\vec B=\int d\vec B$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[line width=1pt] (0,-0.6) -- (0,2.6);
+  \draw[vecv,line width=1.6pt] (0,0.6) -- (0,1.4) node[left,kviolet] {$I\,d\vec l$};
+  \draw[veco] (0,1.0) -- (3.4,0.1) node[midway,above,korange] {$\vec r$};
+  \otimesB{(3.6,0.05)} \node[right] at (3.75,0.05) {$d\vec B$};
+\end{tikzpicture}
+\caption{Поле элемента тока: $d\vec B\perp d\vec l$ и $d\vec B\perp\vec r$ (здесь $d\vec B$ направлен от нас)}
+\end{figure}
+
+\subsection{Поле в центре кругового витка}
+Все элементы $dl$ находятся на расстоянии $R$ от центра, и $d\vec l\perp\vec r$:
+\[
+B=\int dB=\frac{\mu_0}{4\pi}\cdot\frac I{R^2}\int dl=\frac{\mu_0}{4\pi}\cdot\frac I{R^2}\cdot2\pi R.
+\]
+\[
+\kbox{B_{\text{центр}}=\frac{\mu_0I}{2R}}
+\]
+
+\subsection{Поле на оси кругового витка}
+В точке на оси на расстоянии $x$ от центра поперечные составляющие $d\vec B$ от противоположных элементов взаимно уничтожаются,
+остаются только проекции на ось:
+\[
+\kbox{B(x)=\frac{\mu_0IR^2}{2\,(x^2+R^2)^{3/2}}}
+\]
+При $x=0$ получается поле в центре витка; при удалении от витка поле быстро убывает.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[kviolet,line width=1.5pt] (0,0) ellipse (0.45 and 1.3);
+  \draw[->,korange,line width=1.1pt] (-0.42,0.5) -- (-0.36,0.75); \node[korange,left] at (-0.45,0.7) {$I$};
+  \draw[aux] (-0.6,0) -- (3.6,0);
+  \draw[->,line width=0.5pt] (0,0) -- (0,1.3); \node[left,font=\footnotesize] at (0,0.35) {$R$};
+  \draw[veco] (0,1.3) -- (2.6,0) node[pos=0.45,above right,korange] {$\vec r$};
+  \draw[vecv] (2.6,0) -- (3.5,0) node[below,kviolet] {$\vec B$};
+  \fill (2.6,0) circle (1.4pt);
+  \draw[<->] (0,-1.55) -- (2.6,-1.55) node[midway,below] {$x$};
+  \begin{scope}[xshift=5.4cm,yshift=-1.2cm]
+    \draw[axis] (-2.2,0) -- (2.4,0) node[below] {$x$};
+    \draw[axis] (0,0) -- (0,2.8) node[left] {$B$};
+    \draw[kviolet,line width=1.4pt,domain=-2.1:2.1,samples=80] plot (\x,{2.2/(1+(\x/0.7)^2)^1.5});
+    \draw[aux] (0,2.2) -- (0.6,2.2) node[right,black,font=\footnotesize] {$\dfrac{\mu_0I}{2R}$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Поле на оси витка и его зависимость от расстояния $x$}
+\end{figure}
+
+\subsection{Поле бесконечного прямого провода}
+Провод направлен вдоль оси $y$, точка наблюдения — на расстоянии $x$ от провода. Тогда $d\vec l=dy\,\vec e_y$, $\vec r=x\vec e_x-y\vec e_y$,
+$\bigl|[d\vec l\times\vec r]\bigr|=x\,dy$, $r=\sqrt{x^2+y^2}$:
+\[
+B=\frac{\mu_0Ix}{4\pi}\int_{-\infty}^{+\infty}\frac{dy}{(x^2+y^2)^{3/2}}
+=\frac{\mu_0Ix}{4\pi}\cdot\frac{y}{x^2\sqrt{x^2+y^2}}\bigg|_{-\infty}^{+\infty}=\frac{\mu_0Ix}{4\pi}\cdot\frac2{x^2}.
+\]
+\[
+\kbox{B_{\text{провод}}=\frac{\mu_0I}{2\pi x}}
+\]
+Линии поля прямого тока — концентрические окружности вокруг провода (направление — по правилу буравчика).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[line width=1.2pt] (0,-1.6) -- (0,2.0);
+  \draw[->,line width=1.2pt] (0,1.3) -- (0,1.9) node[left] {$I$};
+  \draw[vecv] (0,-0.7) -- (0,-0.2) node[left,kviolet] {$d\vec l$};
+  \node[left] at (-0.1,-1.3) {$y$};
+  \draw[aux] (0,0.6) -- (2.4,0.6) node[pos=0.5,above,black,font=\footnotesize] {$x$};
+  \draw[veco] (0,-0.45) -- (2.4,0.6) node[pos=0.55,below right,korange] {$\vec r$};
+  \otimesB{(2.4,0.6)} \node[right] at (2.55,0.6) {$\vec B$};
+  \begin{scope}[xshift=6.2cm]
+    \draw[kviolet!50,line width=0.9pt] (0,0) ellipse (1.6 and 0.45);
+    \draw[kviolet,line width=1.1pt,postaction={decorate},decoration={markings,mark=at position 0.75 with {\arrow{Stealth}}}] (0,0) ellipse (1.0 and 0.28);
+    \fill[white] (-0.1,0.18) rectangle (0.1,0.5);
+    \draw[line width=1.4pt] (0,-1.6) -- (0,-0.3) (0,0.3) -- (0,2.0);
+    \draw[->,line width=1.4pt] (0,1.3) -- (0,1.9) node[left] {$I$};
+    \node[kviolet] at (1.9,0.2) {$\vec B$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Поле прямого провода с током}
+\end{figure}
+
+\subsection{Поле в центре полуокружности}
+Проводник состоит из двух прямых участков, лежащих на одной прямой с центром, и полуокружности радиуса $R$. Прямые участки поля
+в центре не создают (центр лежит на их оси, $d\vec B=0$), а полуокружность даёт половину поля витка:
+\[
+B=\frac{\mu_0I}{4\pi R^2}\cdot\pi R=\kbox{\frac{\mu_0I}{4R}.}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[kviolet,line width=1.5pt] (-3,0) -- (-1.2,0) arc (180:0:1.2) -- (3,0);
+  \draw[->,korange,line width=1.1pt] (-2.4,0) -- (-1.9,0) node[above,korange] {$I$};
+  \draw[->,korange,line width=1.1pt] (1.9,0) -- (2.4,0) node[above,korange] {$I$};
+  \fill (0,0) circle (1.4pt) node[below] {$O$};
+  \draw[aux] (0,0) -- (0.85,0.85) node[midway,above left,black] {$R$};
+\end{tikzpicture}
+\caption{Проводник с полуокружностью}
+\end{figure}
+
+% ===================== 6 =====================
+\section{Самоиндукция}
+
+\subsection{Индуктивность}
+Ток $I$ в катушке создаёт магнитное поле $B\sim I$, а значит, и магнитный поток через катушку, пропорциональный току:
+\[
+\kbox{\Phi=LI,}
+\]
+где $L$ — \term{индуктивность} катушки. Единица — генри: $[L]=\text{Гн}=\dfrac{\text{Вб}}{\text{А}}=\dfrac{\text{В}\cdot\text{с}}{\text{А}}=\text{Ом}\cdot\text{с}$.
+
+Если ток меняется, меняется и поток, и в катушке возникает \term{ЭДС самоиндукции}:
+\[
+\dot I\ne0\;\Rightarrow\;\dot B\ne0\;\Rightarrow\;\dot\Phi\ne0\;\Rightarrow\;\Ei_{\text{си}}\ne0.
+\]
+\[
+\kbox{\Ei_{\text{си}}=-L\frac{dI}{dt}=-L\dot I}
+\]
+По правилу Ленца ЭДС самоиндукции \akc{препятствует изменению тока}.
+
+\begin{kob}{Важные следствия}
+\begin{itemize}
+\item Ток через катушку \textbf{не может измениться скачком}.
+\item В момент замыкания цепи ($t=0$) ток через катушку равен нулю — катушка ведёт себя как \textbf{разрыв цепи}.
+\item При $t\to\infty$ (установившийся режим) $\dot I=0$, и идеальная катушка ведёт себя как \textbf{обычный провод}.
+\end{itemize}
+\end{kob}
+
+\subsection{Идеальная катушка, подключённая к источнику}
+Для цепи из источника $U_0$ и идеальной катушки (без сопротивления) по правилу Кирхгофа $U_0=L\dot I$, откуда
+\[
+\dot I=\frac{U_0}L=\const,\qquad I(t)=\frac{U_0}L\,t
+\]
+— ток растёт линейно.
+
+\subsection{Установление тока в RL-цепи}
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[line width=0.8pt]
+  \draw (0,0) to[battery1,l=$\Ei$] (0,2.4) to[R,l=$R$] (2.8,2.4) to[L,l=$L$] (2.8,0) -- (1.9,0);
+  \draw (1.9,0) -- (1.2,0.35); \fill (1.9,0) circle (1.3pt); \fill (1.15,0) circle (1.3pt);
+  \draw (1.15,0) -- (0,0);
+  \draw[->,korange,line width=1pt] (3.15,1.5) -- (3.15,0.9) node[right,korange] {$I$};
+  \begin{scope}[xshift=4.6cm]
+    \draw[axis] (0,0) -- (4.6,0) node[below] {$t$};
+    \draw[axis] (0,0) -- (0,2.7) node[left] {$I$};
+    \draw[aux] (0,2.0) -- (4.4,2.0) node[above,black,font=\footnotesize] {$\Ei/R$};
+    \draw[kgray,line width=0.6pt] (0,0) -- (1.0,2.0);
+    \draw[aux] (1.0,0) -- (1.0,2.0); \node[below] at (1.0,0) {$\tau$};
+    \draw[kviolet,line width=1.4pt,domain=0:4.3,samples=60] plot (\x,{2.0*(1-exp(-\x/1.0))});
+  \end{scope}
+\end{circuitikz}
+\caption{Замыкание цепи с катушкой и график тока}
+\end{figure}
+
+По правилу Кирхгофа $\Ei=IR+L\dfrac{dI}{dt}$. Разделяя переменные,
+\[
+dt=\frac{L\,dI}{\Ei-IR}\quad\Longrightarrow\quad t=-\frac LR\ln\frac{\Ei-IR}{\Ei}.
+\]
+\[
+\kbox{I(t)=\frac{\Ei}R\bigl(1-e^{-t/\tau}\bigr),\qquad\tau=\frac LR,\qquad\dot I(0)=\frac{\Ei}L.}
+\]
+Сразу после замыкания $I=0$, а скорость роста тока $\Ei/L$; через большое время ток выходит на значение $\Ei/R$.
+
+\subsection{Энергия магнитного поля катушки}
+Мощность, которую источник тратит на преодоление ЭДС самоиндукции: $P=UI=L\dot I\,I$. За время $\Delta t$ совершается работа
+\[
+\Delta W=P\Delta t=LI\frac{\Delta I}{\Delta t}\Delta t=LI\,\Delta I\quad\Longrightarrow\quad W=L\int_0^II\,dI.
+\]
+\[
+\kbox{W=\frac{LI^2}2}
+\]
+Эта энергия запасена в магнитном поле катушки и выделяется (например, в виде тепла на резисторах) при размыкании цепи.
+
+% ===================== 7 =====================
+\section{Механические колебания}
+
+\subsection{Основные понятия}
+\begin{opr}[период]
+\term{Период} $T$ — время, за которое система совершает одно полное колебание (возвращается в исходное состояние): $x(t)=x(t+T)$.
+\end{opr}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis] (0,0) -- (8.6,0) node[below] {$t$};
+  \draw[axis] (0,-0.2) -- (0,2.0) node[left] {$x$};
+  \draw[kviolet,line width=1.4pt,domain=0:8.2,samples=200] plot (\x,{1+0.45*sin(\x*120)+0.25*sin(\x*240+40)});
+  \draw[aux] (1.0,0) -- (1.0,1.65) (4.0,0) -- (4.0,1.65);
+  \draw[<->,korange] (1.0,-0.35) -- (4.0,-0.35) node[midway,below,korange] {$T$};
+\end{tikzpicture}
+\caption{Периодическое движение}
+\end{figure}
+
+\subsection{Гармонические колебания}
+\[
+\kbox{x(t)=A\sin(\omega t+\varphi_0)}
+\]
+\begin{enumerate}
+\item $A$ — \term{амплитуда} колебаний (м, рад, \ldots{} — в единицах самой величины $x$);
+\item $\varphi_0$ — \term{начальная фаза}, [рад]; $\varphi=\omega t+\varphi_0$ — \term{фаза};
+\item $\omega$ — \term{циклическая (угловая) частота}, [рад/с]: $\omega=\dfrac{2\pi}T$;
+\item $\nu=\dfrac1T$ — \term{частота} колебаний, [Гц].
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis] (0,0) -- (9,0) node[below] {$t$};
+  \draw[axis] (0,-1.8) -- (0,1.9) node[left] {$x$};
+  \draw[aux] (0,1.4) -- (8.6,1.4) (0,-1.4) -- (8.6,-1.4);
+  \node[left] at (0,1.4) {$A$}; \node[left] at (0,-1.4) {$-A$};
+  \draw[kviolet,line width=1.4pt,domain=0:8.6,samples=200] plot (\x,{1.4*sin(\x*90+35)});
+  \draw[korange,dashed] (0,{1.4*sin(35)}) -- (0.25,{1.4*sin(35)});
+  \fill[korange] (0,{1.4*sin(35)}) circle (1.8pt);
+  \node[left,korange] at (0,{1.4*sin(35)}) {$A\sin\varphi_0$};
+\end{tikzpicture}
+\caption{График гармонических колебаний}
+\end{figure}
+
+\subsection{Математический маятник}
+\textbf{Модель:} нить нерастяжима и невесома; трения нет; груз — материальная точка; колебания малые ($x\ll l$, угол $\alpha\ll1$,
+на практике $\alpha\lesssim0{,}5$ рад).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \fill[wall] (-1.2,0) rectangle (1.2,0.22); \draw[line width=0.8pt] (-1.2,0) -- (1.2,0);
+  \draw[aux] (0,0) -- (0,-3.1);
+  \draw[line width=1pt] (0,0) -- (-75:3.0);
+  \fill[kviolet] (-75:3.0) circle (0.16);
+  \node[right] at (-75:3.15) {$m$};
+  \node[right] at (-80:1.6) {$l$};
+  \draw (0,-1.0) arc (-90:-75:1.0); \node[font=\footnotesize] at (0.13,-1.25) {$\alpha$};
+  \draw[<->] (0,-3.35) -- ({3*cos(-75)},-3.35) node[midway,below] {$x$};
+  \draw[veco] (2.0,-1.2) -- (2.0,-2.2) node[right,korange] {$\vec g$};
+\end{tikzpicture}
+\caption{Математический маятник}
+\end{figure}
+
+\textbf{Метод размерностей.} Ищем период в виде $T=C\,l^\alpha m^\beta g^\gamma$, где $C$ — безразмерная константа:
+\[
+\text{с}=\text{м}^\alpha\cdot\text{кг}^\beta\cdot\Bigl(\frac{\text{м}}{\text{с}^2}\Bigr)^\gamma\;\Rightarrow\;
+\begin{cases}
+\text{с}:\ 1=-2\gamma\;\Rightarrow\;\gamma=-\frac12,\\[2pt]
+\text{м}:\ 0=\alpha+\gamma\;\Rightarrow\;\alpha=\frac12,\\[2pt]
+\text{кг}:\ 0=\beta.
+\end{cases}
+\]
+Значит, $T=C\sqrt{l/g}$; точный расчёт даёт $C=2\pi$:
+\[
+\kbox{T=2\pi\sqrt{\frac lg}}
+\]
+Период малых колебаний \akc{не зависит от массы груза и от амплитуды}.
+
+\subsection{Пружинный маятник}
+\textbf{Модель:} трения нет ($\mu=0$); пружина невесома.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \fill[wall] (-0.25,0) rectangle (0,1.2); \draw[line width=0.8pt] (0,0) -- (0,1.2);
+  \fill[wall] (0,-0.22) rectangle (6,0); \draw[line width=0.8pt] (0,0) -- (6,0);
+  \draw[kviolet,line width=1pt,decorate,decoration={coil,aspect=0.5,segment length=4.5pt,amplitude=5pt}] (0,0.45) -- (2.8,0.45);
+  \node[above,kviolet] at (1.4,0.75) {$k$};
+  \draw[line width=1pt,fill=korange!20] (2.8,0) rectangle (3.8,0.9); \node at (3.3,0.45) {$m$};
+  \draw[axis] (2.8,-0.6) -- (5.8,-0.6) node[below] {$x$};
+  \draw (2.8,-0.5) -- (2.8,-0.7) node[below] {$0$};
+\end{tikzpicture}
+\caption{Пружинный маятник}
+\end{figure}
+
+\textbf{Метод размерностей:} $T=C\,k^\alpha m^\beta$, $[k]=\text{Н/м}=\text{кг/с}^2$:
+\[
+\text{с}=\Bigl(\frac{\text{кг}}{\text{с}^2}\Bigr)^\alpha\text{кг}^\beta\;\Rightarrow\;
+\begin{cases}
+\text{с}:\ 1=-2\alpha\;\Rightarrow\;\alpha=-\frac12,\\[2pt]
+\text{кг}:\ 0=\alpha+\beta\;\Rightarrow\;\beta=\frac12.
+\end{cases}
+\]
+\[
+\kbox{T=2\pi\sqrt{\frac mk}}
+\]
+
+\subsection{Строгий вывод для пружинного маятника}
+\textbf{Силовой подход.} Второй закон Ньютона в проекции на ось $x$: $-kx=ma_x$, где
+$a_x=\dfrac{\Delta v_x}{\Delta t}=\dot v_x=\ddot x=\dfrac{d^2x}{dt^2}$. Получаем \term{уравнение гармонических колебаний}:
+\[
+\kbox{\ddot x+\frac km\,x=0}
+\]
+Подставим $x=A\sin\omega t$: $\dot x=A\omega\cos\omega t$, $\ddot x=-A\omega^2\sin\omega t$. Тогда
+\[
+-A\omega^2\sin\omega t+\frac km A\sin\omega t=0\;\Rightarrow\;\omega=\sqrt{\frac km},\qquad T=\frac{2\pi}\omega=2\pi\sqrt{\frac mk}.
+\]
+
+\textbf{Энергетический подход.} По закону сохранения энергии
+\[
+E=\frac{m\dot x^2}2+\frac{kx^2}2=\const\quad\Longleftrightarrow\quad\dot x^2+\frac kmx^2=\const.
+\]
+Подставляя $x=A\sin\omega t$: $(A\omega)^2\cos^2\omega t+\dfrac kmA^2\sin^2\omega t=\const$. Это выполняется при всех $t$ только если
+$\omega^2=\dfrac km$, — снова $T=2\pi\sqrt{m/k}$.
+
+% ===================== 8 =====================
+\section{Электромагнитные колебания}
+
+\subsection{Колебательный контур}
+Конденсатор ёмкости $C$, заряженный до напряжения $U_0$, замыкают на катушку индуктивности $L$.
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[line width=0.8pt]
+  \draw (0,0) to[L,l=$L$] (0,2.2) -- (2.6,2.2) to[C,l=$C$] (2.6,0) -- (0,0);
+  \draw[->,korange,line width=1pt] (1.0,2.45) -- (1.6,2.45) node[right,korange] {$I$};
+\end{circuitikz}
+\caption{Колебательный (LC) контур}
+\end{figure}
+
+Катушка и конденсатор соединены параллельно, поэтому $U_C=U_L$:
+\[
+\frac qC=-L\dot I,\qquad I=\frac{dq}{dt}=\dot q\quad\Longrightarrow\quad L\ddot q+\frac qC=0.
+\]
+\[
+\kbox{\ddot q+\frac1{LC}\,q=0,\qquad q(t)=q_0\cos(\omega t+\varphi),\qquad\omega=\frac1{\sqrt{LC}}}
+\]
+$q_0$ — амплитуда заряда. Период колебаний — \term{формула Томсона}:
+\[
+\kbox{T=2\pi\sqrt{LC}}
+\]
+Сила тока:
+\[
+I=\dot q=-q_0\omega\sin(\omega t+\varphi),\qquad I_0=\omega q_0\ \text{— амплитуда тока.}
+\]
+Заряд меняется по косинусу, ток — по синусу: когда заряд максимален, ток равен нулю, и наоборот.
+
+\subsection{Энергия в колебательном контуре}
+\[
+\kbox{W=W_C+W_L=\frac{q^2}{2C}+\frac{LI^2}2=\const,\qquad W=\frac{q_0^2}{2C}=\frac{CU_0^2}2=\frac{LI_0^2}2.}
+\]
+Энергия электрического поля конденсатора периодически переходит в энергию магнитного поля катушки и обратно; максимальная энергия
+конденсатора равна максимальной энергии катушки: $W_{C\max}=W_{L\max}$.
+
+\subsection{Аналогия механических и электромагнитных колебаний}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.75}
+\begin{tabular}{ll}
+\toprule
+{\hfont\color{kviolet}Пружинный маятник} & {\hfont\color{korange}Колебательный контур}\\
+\midrule
+координата $x$ & заряд $q$\\
+скорость $v=\dot x$ & сила тока $I=\dot q$\\
+масса $m$ & индуктивность $L$\\
+жёсткость $k$ & величина $1/C$\\
+$\ddot x+\dfrac kmx=0$ & $\ddot q+\dfrac1{LC}q=0$\\
+$T=2\pi\sqrt{m/k}$ & $T=2\pi\sqrt{LC}$\\
+$\dfrac{mv^2}2+\dfrac{kx^2}2=\const$ & $\dfrac{LI^2}2+\dfrac{q^2}{2C}=\const$\\
+\bottomrule
+\end{tabular}
+\caption{Соответствие величин}
+\end{table}
+
+\end{document}

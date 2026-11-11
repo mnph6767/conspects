@@ -1,0 +1,261 @@
+% =====================================================================
+%  konspekt.sty — единый стиль конспектов
+%  Белый лист, чёрный текст; акценты: фиолетовый и оранжевый (Claude)
+%  Сборка: ./build.sh <файл.tex>  (hyph.py + latexmk -xelatex)
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{konspekt}[2026/11/11 Единый стиль конспектов]
+
+% ---------- Поля ----------
+\RequirePackage[a4paper,top=24mm,bottom=22mm,left=20mm,right=20mm,
+  headheight=16pt,headsep=8mm,footskip=11mm]{geometry}
+
+% ---------- Математика и шрифты ----------
+\RequirePackage{amsmath,amssymb,mathtools,amsthm}
+\RequirePackage{fontspec}
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\setmainfont{Liberation Serif}
+\setsansfont{Inter}
+\setmonofont{DejaVu Sans Mono}[Scale=0.88]
+\setmathfont{Latin Modern Math}
+\newfontfamily\hfont{Inter SemiBold}
+\newfontfamily\hfontx{Inter ExtraBold}
+\newfontfamily\hfontl{Inter Light}
+\newfontfamily\hfontm{Inter Medium}
+
+\RequirePackage{polyglossia}
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+\newfontfamily\cyrillicfont{Liberation Serif}
+\newfontfamily\cyrillicfontsf{Inter}
+\newfontfamily\cyrillicfonttt{DejaVu Sans Mono}[Scale=0.88]
+
+% Переносы: в системе нет шаблонов hyph-ru, поэтому перед сборкой
+% скрипт hyph.py составляет список \hyphenation для слов конспекта (\jobname-hyph.tex)
+\AtBeginDocument{\InputIfFileExists{\jobname-hyph.tex}{}{}\lefthyphenmin=2 \righthyphenmin=2 }
+
+% ---------- Цвета ----------
+\RequirePackage{xcolor}
+\definecolor{kviolet}{HTML}{6A4BC4}   % фиолетовый
+\definecolor{korange}{HTML}{D97757}   % оранжевый, как у Claude
+\definecolor{kgray}{HTML}{6B6B6B}
+\definecolor{klight}{HTML}{BDBDBD}
+\colorlet{kvioletbg}{kviolet!5}
+\colorlet{korangebg}{korange!7}
+
+\newcommand{\vio}[1]{\textcolor{kviolet}{#1}}
+\newcommand{\ora}[1]{\textcolor{korange}{#1}}
+\newcommand{\term}[1]{\textbf{\textcolor{kviolet}{#1}}}   % термин в тексте
+\newcommand{\akc}[1]{\textbf{\textcolor{korange}{#1}}} % акцент в тексте
+
+% ---------- Графика ----------
+\RequirePackage{tikz,pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,calc,positioning,decorations.pathreplacing,
+  decorations.markings,decorations.pathmorphing,patterns,shapes.geometric,
+  intersections,angles,quotes,3d,shadings,backgrounds,fadings}
+\tikzset{
+  >={Stealth[length=2.6mm,width=1.8mm]},
+  every picture/.style={line cap=round,line join=round,font=\small},
+  axis/.style={->,black,line width=0.6pt},
+  vecv/.style={->,kviolet,line width=1.1pt},
+  veco/.style={->,korange,line width=1.1pt},
+  aux/.style={kgray,dashed,line width=0.5pt},
+  thin aux/.style={klight,line width=0.4pt},
+  dot/.style={circle,fill=black,inner sep=1.2pt},
+  vdot/.style={circle,fill=kviolet,inner sep=1.3pt},
+  odot/.style={circle,fill=korange,inner sep=1.3pt},
+  vfill/.style={fill=kviolet!12},
+  ofill/.style={fill=korange!18},
+}
+\pgfplotsset{
+  kplot/.style={axis lines=left,axis line style={->,line width=0.6pt},
+    tick label style={font=\footnotesize},label style={font=\small},
+    every axis plot/.append style={line width=1pt},
+    grid style={klight!60,line width=0.3pt}},
+}
+
+\tikzset{iso/.style={x={(-0.42cm,-0.38cm)},y={(1cm,0cm)},z={(0cm,1cm)}}}
+% Текст слева, рисунок справа: \sidefig[доля ширины под рисунок]{текст}{рисунок}
+\NewDocumentCommand{\sidefig}{O{0.36} +m +m}{\par\noindent
+  \begin{minipage}[c]{\dimexpr\linewidth-#1\linewidth-5mm\relax}\setlength{\parskip}{4pt plus 1pt}#2\end{minipage}\hfill
+  \begin{minipage}[c]{#1\linewidth}\centering #3\end{minipage}\par\medskip}
+\newcommand{\ov}[1]{\overrightarrow{#1}}
+
+% ---------- Подписи ----------
+\RequirePackage{float}\floatplacement{figure}{H}\floatplacement{table}{H}
+\RequirePackage{caption}
+\DeclareCaptionFont{kcap}{\color{kgray}\small}
+\DeclareCaptionLabelFormat{kbold}{{\hfont\color{kviolet}#1~#2}}
+\captionsetup{font=kcap,labelformat=kbold,labelsep=period,justification=centering,skip=5pt}
+\captionsetup[figure]{name=Рис.}
+\captionsetup[table]{name=Таблица}
+
+% ---------- Таблицы, списки ----------
+\RequirePackage{booktabs,array,tabularx,multirow}
+\RequirePackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\setlist[itemize,1]{label={\color{korange}\small$\blacktriangleright$},leftmargin=1.4em}
+\setlist[itemize,2]{label={\color{kviolet}\textbullet},leftmargin=1.2em}
+\setlist[enumerate,1]{label={\hfont\color{kviolet}\arabic*)},leftmargin=1.6em}
+\setlist[enumerate,2]{label={\color{korange}\alph*)},leftmargin=1.4em}
+
+% ---------- Абзацы ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}\tolerance=800\hbadness=3000
+\linespread{1.08}
+\RequirePackage{microtype}
+\RequirePackage{needspace}
+\RequirePackage{xparse}
+\RequirePackage{multicol}
+\RequirePackage{wrapfig}
+
+% ---------- Заголовки ----------
+\RequirePackage[explicit]{titlesec}
+\titleformat{\section}[block]
+  {\needspace{12\baselineskip}\hfont\LARGE}
+  {}{0pt}
+  {\begin{tikzpicture}[baseline=(n.base)]
+     \node[fill=korange,text=white,font=\hfontx\Large,minimum width=9mm,
+           minimum height=9mm,inner sep=0pt,rounded corners=1.5pt] (n) {\thesection};
+   \end{tikzpicture}\hspace{3mm}\textcolor{kviolet}{#1}}
+  [\vspace{1.5mm}{\color{kviolet}\titlerule[0.8pt]}]
+\titleformat{name=\section,numberless}[block]
+  {\hfont\LARGE}{}{0pt}{\textcolor{kviolet}{#1}}[\vspace{1.5mm}{\color{kviolet}\titlerule[0.8pt]}]
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+
+\titleformat{\subsection}[block]
+  {\needspace{4\baselineskip}\hfont\large}
+  {\textcolor{korange}{\thesubsection}}{2.5mm}{\textcolor{kviolet}{#1}}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+
+\titleformat{\subsubsection}[runin]
+  {\hfont\normalsize}{}{0pt}{\textcolor{kviolet}{#1.}}
+\titlespacing*{\subsubsection}{0pt}{8pt}{0.6em}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+
+% ---------- Колонтитулы ----------
+\RequirePackage{fancyhdr}
+\newcommand{\kheadleft}{}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\footnotesize\color{kgray}\kheadleft}
+\fancyhead[R]{\sffamily\footnotesize\color{kviolet}\nouppercase{\rightmark}}
+\fancyfoot[C]{\hfont\small\color{korange}\thepage}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{korange}\leaders\hrule height 0.5pt\hfill}}
+\renewcommand{\sectionmark}[1]{\markboth{\thesection.~#1}{\thesection.~#1}}\renewcommand{\subsectionmark}[1]{}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\hfont\small\color{korange}\thepage}\renewcommand{\headrule}{}}
+
+% ---------- Блоки ----------
+\RequirePackage[most]{tcolorbox}
+\tcbset{
+  kbase/.style={enhanced,breakable,arc=1.5pt,outer arc=1.5pt,
+    boxrule=0pt,leftrule=2.6pt,left=8pt,right=8pt,top=5pt,bottom=5pt,
+    before skip=8pt,after skip=8pt,parbox=false},
+  kv/.style={kbase,colframe=kviolet,colback=kvioletbg},
+  ko/.style={kbase,colframe=korange,colback=korangebg},
+}
+% Блок с меткой в начале текста
+\NewDocumentEnvironment{kvb}{m}
+  {\begin{tcolorbox}[kv,before upper={{\hfont\color{kviolet}#1.}\enskip}]}
+  {\end{tcolorbox}}
+\NewDocumentEnvironment{kob}{m}
+  {\begin{tcolorbox}[ko,before upper={{\hfont\color{korange}#1.}\enskip}]}
+  {\end{tcolorbox}}
+
+\NewDocumentEnvironment{opr}{o}{\begin{kvb}{Определение\IfValueT{#1}{ (#1)}}}{\end{kvb}}
+\NewDocumentEnvironment{teo}{o}{\begin{kob}{Теорема\IfValueT{#1}{ (#1)}}}{\end{kob}}
+\NewDocumentEnvironment{svv}{o}{\begin{kvb}{\IfValueTF{#1}{#1}{Свойства}}}{\end{kvb}}
+\NewDocumentEnvironment{itog}{}{\begin{kob}{Итог}}{\end{kob}}
+
+% Замечание — лёгкий блок без заливки
+\NewDocumentEnvironment{zam}{o}
+  {\begin{tcolorbox}[enhanced,breakable,boxrule=0pt,leftrule=1.2pt,arc=0pt,
+     colframe=korange,colback=white,left=8pt,right=4pt,top=2pt,bottom=2pt,
+     before skip=6pt,after skip=6pt,parbox=false,
+     before upper={{\hfont\color{korange}\IfValueTF{#1}{#1}{Замечание}.}\enskip}]}
+  {\end{tcolorbox}}
+
+% Формула в рамке с заголовком (справочная)
+\NewDocumentEnvironment{fbx}{m}
+  {\begin{tcolorbox}[enhanced,breakable,arc=1.5pt,boxrule=0.7pt,
+     colframe=kviolet,colback=white,colbacktitle=kviolet,coltitle=white,
+     fonttitle=\hfont\small,title={#1},toptitle=1.5pt,bottomtitle=1.5pt,
+     left=8pt,right=8pt,top=4pt,bottom=4pt,before skip=8pt,after skip=8pt,parbox=false]}
+  {\end{tcolorbox}}
+
+% Выделенная формула
+\tcbset{highlight math style={enhanced,colframe=kviolet,colback=white,
+  boxrule=0.7pt,arc=1.5pt,left=4pt,right=4pt,top=1pt,bottom=1pt}}
+\newcommand{\kbox}[1]{\tcbhighmath{#1}}
+
+% Доказательство
+\renewcommand{\proofname}{Доказательство}
+\renewcommand{\qedsymbol}{\textcolor{kviolet}{$\blacksquare$}}
+\renewenvironment{proof}[1][\proofname]
+  {\par\pushQED{\qed}\normalfont\topsep4pt\trivlist
+   \item[\hskip\labelsep{\hfontm\color{kviolet}#1.}]\ignorespaces}
+  {\popQED\endtrivlist\par}
+
+% ---------- Обозначения ----------
+\newcommand{\E}{\operatorname{E}}
+\newcommand{\D}{\operatorname{D}}
+\renewcommand{\P}{\operatorname{P}}
+\DeclareMathOperator{\cov}{cov}
+\newcommand{\vv}[1]{\vec{#1}}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\norm}[1]{\left\lvert #1\right\rvert}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+
+% ---------- Гиперссылки ----------
+\RequirePackage[hidelinks,unicode,bookmarksnumbered,bookmarksopen,
+  pdfpagelabels]{hyperref}
+\RequirePackage{bookmark}
+
+% ---------- Содержание ----------
+\RequirePackage{titletoc}
+\titlecontents{section}[8mm]
+  {\addvspace{4pt}\hfont\normalsize}
+  {\contentslabel[{\color{korange}\thecontentslabel}]{8mm}\color{kviolet}}
+  {\color{kviolet}}
+  {\hfill{\color{korange}\thecontentspage}}
+\titlecontents{subsection}[18mm]
+  {\addvspace{0pt}\small}
+  {\contentslabel[{\color{kgray}\thecontentslabel}]{10mm}}
+  {}
+  {\color{klight}\titlerule*[0.7pc]{.}\color{black}\contentspage}
+
+\newcommand{\maketoc}{%
+  \thispagestyle{plain}\pdfbookmark[1]{Содержание}{toc}%
+  {\hfontx\LARGE\color{kviolet}Содержание\par}
+  \vspace{2mm}{\color{korange}\rule{\linewidth}{0.8pt}}\par\vspace{2mm}
+  \begingroup\linespread{1.0}\selectfont\setlength{\parskip}{0pt}\makeatletter\@starttoc{toc}\makeatother\endgroup
+  \clearpage}
+
+% ---------- Обложка ----------
+% \makecover{название предмета}{рисунок tikz}
+\NewDocumentCommand{\makecover}{m +m}{%
+  \thispagestyle{empty}%
+  \pdfbookmark[1]{Обложка}{cover}%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[korange] ($(current page.north west)+(20mm,-18mm)$) rectangle ++(28mm,1.6mm);
+    \fill[kviolet] ($(current page.north west)+(50mm,-18mm)$) rectangle ++(12mm,1.6mm);
+    \fill[korange] ($(current page.south east)+(-48mm,18mm)$) rectangle ++(28mm,1.6mm);
+    \fill[kviolet] ($(current page.south east)+(-62mm,18mm)$) rectangle ++(12mm,1.6mm);
+  \end{tikzpicture}%
+  \vspace*{22mm}
+  \begin{center}
+  {\hfontx\fontsize{38}{46}\selectfont\color{kviolet}#1\par}
+  \vspace{4mm}{\color{korange}\rule{30mm}{1pt}}\par
+  \end{center}
+  \vfill
+  \begin{center}\scalebox{1.12}{#2}\end{center}
+  \vfill\vspace*{12mm}
+  \clearpage}
+
+\endinput
