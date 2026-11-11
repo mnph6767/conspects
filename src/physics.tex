@@ -12,10 +12,8 @@
 
 \begin{document}
 
-% ===================== ОБЛОЖКА =====================
 \makecover{Физика}
 {\begin{tikzpicture}[scale=1.05]
-  % силовые линии витка (сечение)
   \foreach \c in {1.1,1.35,1.75,2.35} {
     \pgfmathsetmacro{\r}{sqrt(\c*\c-1)}
     \draw[kviolet!80,line width=0.9pt,postaction={decorate},decoration={markings,mark=at position 0.25 with {\arrow{Stealth[length=2mm]}}}]
@@ -27,10 +25,8 @@
   \fill[white] (0,0) ellipse (1.05 and 0.28);
   \draw[korange,line width=2.4pt] (0,0) ellipse (1 and 0.25);
   \node[korange,font=\large] at (1.35,-0.45) {$I$};
-  % синусоида
   \draw[korange,line width=1.6pt,domain=0:9.4,samples=150,shift={(-4.7,-3.7)}] plot (\x,{0.75*sin(\x*76.6)});
   \draw[axis,shift={(-4.7,-3.7)}] (0,0) -- (9.8,0) node[below] {$t$};
-  % маятник
   \begin{scope}[shift={(6.3,2.4)}]
     \fill[wall] (-0.8,0) rectangle (0.8,0.2); \draw (-0.8,0) -- (0.8,0);
     \draw[aux] (0,0) -- (0,-2.6);
@@ -42,7 +38,6 @@
 
 \maketoc
 
-% ===================== 1 =====================
 \section{Повторение 10 класса: термодинамика}
 
 \subsection{Уравнение состояния идеального газа}
@@ -148,7 +143,6 @@ Q_1=A+Q_2.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[xscale=1.25,yscale=1.0]
-  % изотермы p=c/V, адиабаты p=k/V^2 (gamma=2 для наглядности)
   \def\c{4.0}\def\cc{1.6}
   \pgfmathsetmacro{\Va}{1} \pgfmathsetmacro{\Vb}{1.8}
   \pgfmathsetmacro{\Vc}{\Vb*\c/\cc} \pgfmathsetmacro{\Vd}{\Va*\c/\cc}
@@ -202,7 +196,6 @@ pV^n=\const,\qquad n=\frac{C-C_p}{C-C_V}.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
-  % смачивание (theta = 50)
   \begin{scope}[scale=1.25]
   \fill[wall] (-1.8,-0.2) rectangle (1.8,0); \draw[line width=0.8pt] (-1.8,0) -- (1.8,0);
   \fill[kviolet!15] (1.3,0) arc (40:140:1.70) -- cycle;
@@ -212,7 +205,6 @@ pV^n=\const,\qquad n=\frac{C-C_p}{C-C_V}.
   \node[korange,font=\footnotesize] at (0.7,0.24) {$\theta$};
   \node[font=\footnotesize] at (0,-0.5) {смачивание, $\theta<90^\circ$};
   \end{scope}
-  % несмачивание
   \begin{scope}[xshift=5.4cm,scale=1.25]
   \fill[wall] (-1.8,-0.2) rectangle (1.8,0); \draw[line width=0.8pt] (-1.8,0) -- (1.8,0);
   \fill[kviolet!15] (0,0.62) circle (0.75);
@@ -235,7 +227,6 @@ pV^n=\const,\qquad n=\frac{C-C_p}{C-C_V}.
 Для сферической капли радиуса $R$: $\Delta p=\dfrac{2\sigma}R$.
 \end{kvb}
 
-% ===================== 2 =====================
 \section{Магнитное поле}
 
 \subsection{Индукция магнитного поля}
@@ -325,7 +316,6 @@ F_{\text{А}}=N\cdot F_{\text{Л}}=nSl\cdot evB=(evnS)\,lB=BIl.
 \Phi_E=\int(\vec E,d\vec S),\qquad \Phi_B=\int(\vec B,d\vec S).
 \]
 
-% ===================== 3 =====================
 \section{Движение заряженной частицы в магнитном поле}
 
 \subsection{Работа силы Лоренца}
@@ -427,7 +417,6 @@ v=\sqrt{2\gamma U},\qquad R=\frac{\sqrt{2\gamma U}}{\gamma B}=\frac1B\sqrt{\frac
 \caption{Дрейф частицы вдоль границы областей с разным полем}
 \end{figure}
 
-% ===================== 4 =====================
 \section{Электромагнитная индукция}
 
 \subsection{Магнитный поток}
@@ -632,7 +621,6 @@ qE=qvB\quad\Longrightarrow\quad E=vB.
 При малом отклонении от \textbf{устойчивого} положения равновесия возникает сила, возвращающая систему обратно; от \textbf{неустойчивого} —
 сила, уводящая её дальше; в \textbf{безразличном} — сила не возникает.
 
-% ===================== 5 =====================
 \section{Закон Био–Савара–Лапласа}
 
 Элемент проводника $d\vec l$ с током $I$ создаёт в точке, заданной радиус-вектором $\vec r$, магнитное поле
@@ -744,7 +732,6 @@ B=\frac{\mu_0I}{4\pi R^2}\cdot\pi R=\kbox{\frac{\mu_0I}{4R}.}
 \caption{Проводник с полуокружностью}
 \end{figure}
 
-% ===================== 6 =====================
 \section{Самоиндукция}
 
 \subsection{Индуктивность}
@@ -818,7 +805,6 @@ dt=\frac{L\,dI}{\Ei-IR}\quad\Longrightarrow\quad t=-\frac LR\ln\frac{\Ei-IR}{\Ei
 \]
 Эта энергия запасена в магнитном поле катушки и выделяется (например, в виде тепла на резисторах) при размыкании цепи.
 
-% ===================== 7 =====================
 \section{Механические колебания}
 
 \subsection{Основные понятия}
@@ -946,7 +932,6 @@ E=\frac{m\dot x^2}2+\frac{kx^2}2=\const\quad\Longleftrightarrow\quad\dot x^2+\fr
 Подставляя $x=A\sin\omega t$: $(A\omega)^2\cos^2\omega t+\dfrac kmA^2\sin^2\omega t=\const$. Это выполняется при всех $t$ только если
 $\omega^2=\dfrac km$, — снова $T=2\pi\sqrt{m/k}$.
 
-% ===================== 8 =====================
 \section{Электромагнитные колебания}
 
 \subsection{Колебательный контур}

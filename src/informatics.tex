@@ -6,7 +6,6 @@
 \usepackage{forest}
 \usepackage{listings}
 
-% ---------- автоматы ----------
 \tikzset{
   fa/.style={>={Stealth[length=2.4mm,width=1.7mm]},node distance=2.4cm,auto,
     every state/.style={draw=kviolet,line width=1pt,fill=kviolet!7,minimum size=9mm,inner sep=1pt,font=\normalsize},
@@ -15,7 +14,6 @@
     every loop/.style={min distance=7mm,looseness=8}},
   lbl/.style={font=\small,inner sep=1.5pt},
 }
-% ---------- код ----------
 \lstdefinestyle{kcode}{basicstyle=\ttfamily\small,keywordstyle=\color{kviolet}\bfseries,
   commentstyle=\color{korange}\itshape,stringstyle=\color{korange},
   frame=leftline,framerule=2.4pt,rulecolor=\color{kviolet},backgroundcolor=\color{kviolet!4},
@@ -29,7 +27,6 @@
 
 \begin{document}
 
-% ===================== ОБЛОЖКА =====================
 \makecover{Информатика}
 {\begin{tikzpicture}[fa,node distance=2.6cm,scale=1.1,transform shape]
   \node[state,initial] (q0) {$q_0$};
@@ -63,7 +60,6 @@
 
 \maketoc
 
-% ===================== 1 =====================
 \section{Цепочки и языки}
 
 \textbf{Первичное понятие:} символ.
@@ -109,7 +105,6 @@ $\Sigma^+$ — множество всех \textbf{непустых} цепоч�
 \term{Декартово произведение}: $A\times B=\{(a,b)\mid a\in A,\ b\in B\}$.
 \end{opr}
 
-% ===================== 2 =====================
 \section{Грамматики}
 
 \subsection{Определение грамматики и пример вывода}
@@ -163,7 +158,6 @@ $G_1$ и $G_2$ называются \term{эквивалентными}, есл�
 $G_1$ и $G_2$ называются \term{почти эквивалентными}, если $L(G_1)\cup\{\varepsilon\}=L(G_2)\cup\{\varepsilon\}$.
 \end{opr}
 
-% ===================== 3 =====================
 \section{Классификация Хомского}
 
 \subsection{Типы грамматик}
@@ -223,7 +217,6 @@ $G_1$ и $G_2$ называются \term{почти эквивалентным�
 не будет конечным — подходит только изменение строки из середины.
 \end{zam}
 
-% ===================== 4 =====================
 \section{Структура вывода в КС-грамматиках}
 
 \subsection{Левый и правый вывод}
@@ -282,7 +275,6 @@ S\rul aAB\mid E\\ A\rul dDA\\ B\rul bE\mid f\\ C\rul cAB\mid dSD\mid a\\ D\rul e
 \]
 Недостижимые: $C$. Бесплодные: $A,\ D$.
 
-% ===================== 5 =====================
 \section{Преобразование грамматик}
 
 \subsection{Очистка грамматики}
@@ -363,7 +355,6 @@ $P:\ S\rul ab,\ B\rul aB\mid b$.
 \end{enumerate}
 \end{kvb}
 
-% ===================== 6 =====================
 \section{Компиляция на практике}
 
 \begin{kob}{Как это используется на практике}
@@ -422,7 +413,6 @@ $P:\ S\rul ab,\ B\rul aB\mid b$.
 \caption{Порождающие и распознающие формализмы}
 \end{table}
 
-% ===================== 7 =====================
 \section{Регулярные языки}
 
 \subsection{НКА и ДКА}
@@ -546,7 +536,6 @@ A\rul Sa\mid Bb\mid a\\ B\rul Ba\mid Aa\\ S\rul Sb\mid Ab\mid b
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[fa,node distance=1.9cm]
-  % праволинейные
   \node[state] (A1) {$A$}; \node[state,right=of A1,dashed] (B1) {$B$};
   \node[right=1.4cm of B1] (r1) {$A\rul\alpha B$};
   \node[state,below=1.2cm of A1] (A2) {$A$}; \node[state,accepting,right=of A2] (B2) {$B$};
@@ -554,7 +543,6 @@ A\rul Sa\mid Bb\mid a\\ B\rul Ba\mid Aa\\ S\rul Sb\mid Ab\mid b
   \path[->] (A1) edge node[lbl] {$\alpha$} (B1) (A2) edge node[lbl] {$\alpha$} (B2);
   \node[font=\Large,kviolet] at ($(B1)!0.5!(B2)+(1.0,0)$) {$\Longleftrightarrow$};
   \node[font=\hfont\small,kviolet] at ($(A1)!0.5!(r1)+(0,1.0)$) {праволинейная};
-  % леволинейные
   \begin{scope}[xshift=8.2cm]
   \node[state] (C1) {$A$}; \node[state,right=of C1] (D1) {$B$};
   \draw[->,dashed,kgray] ($(C1)+(-1.2,0)$) -- (C1);
@@ -986,7 +974,6 @@ $S\rul\alpha B',\ B'\rul\beta B'\mid\varepsilon$ & $\langle S\rangle::=\alpha\{\
 
 Квадратные скобки — \term{необязательная часть}, фигурные — \term{повторение} (ноль и более раз). Обычно $\varepsilon$ в BNF не используют.
 
-% ===================== 8 =====================
 \section{Синтаксический анализ}
 
 \subsection{Пример и классификация алгоритмов}
@@ -1126,7 +1113,6 @@ void F() {
 \textbf{Построение:}
 \begin{lstlisting}
 Node* E() {
-    // операция + левоассоциативна
     Node* left = T();
     while (t == '+') {
         gt();
