@@ -1,0 +1,1233 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{konspekt}
+\renewcommand{\kheadleft}{Информатика}
+\hypersetup{pdftitle={Конспект по информатике},pdfauthor={Конспект теории}}
+\usetikzlibrary{automata}
+\usepackage{forest}
+\usepackage{listings}
+
+% ---------- автоматы ----------
+\tikzset{
+  fa/.style={>={Stealth[length=2.4mm,width=1.7mm]},node distance=2.4cm,auto,
+    every state/.style={draw=kviolet,line width=1pt,fill=kviolet!7,minimum size=9mm,inner sep=1pt,font=\normalsize},
+    accepting/.style={double=white,double distance=1.2pt,draw=korange,fill=korange!10},
+    initial text={},every edge/.style={draw,line width=0.8pt},
+    every loop/.style={min distance=7mm,looseness=8}},
+  lbl/.style={font=\small,inner sep=1.5pt},
+}
+% ---------- код ----------
+\lstdefinestyle{kcode}{basicstyle=\ttfamily\small,keywordstyle=\color{kviolet}\bfseries,
+  commentstyle=\color{korange}\itshape,stringstyle=\color{korange},
+  frame=leftline,framerule=2.4pt,rulecolor=\color{kviolet},backgroundcolor=\color{kviolet!4},
+  xleftmargin=10pt,framexleftmargin=6pt,aboveskip=8pt,belowskip=8pt,
+  columns=fullflexible,keepspaces=true,showstringspaces=false,breaklines=true,
+  language=C++,morekeywords={Node,nullptr},extendedchars=true}
+\lstset{style=kcode}
+\lstMakeShortInline[basicstyle=\ttfamily\small\color{kviolet!70!black},breaklines=false]@
+\newcommand{\tok}[1]{\tikz[baseline=(t.base)]\node[draw=kviolet,line width=0.6pt,rounded corners=1.5pt,fill=kviolet!6,inner sep=2.5pt,font=\ttfamily\small](t){#1};}
+\newcommand{\rul}{\rightarrow}
+
+\begin{document}
+
+% ===================== ОБЛОЖКА =====================
+\makecover{Информатика}
+{\begin{tikzpicture}[fa,node distance=2.6cm,scale=1.1,transform shape]
+  \node[state,initial] (q0) {$q_0$};
+  \node[state,right=of q0] (q1) {$q_1$};
+  \node[state,accepting,right=of q1] (q2) {$q_2$};
+  \node[state,below=2.2cm of q1] (q3) {$q_3$};
+  \path[->] (q0) edge[kviolet] node[lbl] {$a$} (q1)
+            (q1) edge[kviolet] node[lbl] {$b$} (q2)
+            (q0) edge[loop above,kviolet] node[lbl] {$b$} ()
+            (q2) edge[loop above,korange] node[lbl] {$a,b$} ()
+            (q1) edge[bend left=20,kviolet] node[lbl] {$a$} (q3)
+            (q3) edge[bend left=20,kviolet] node[lbl] {$b$} (q1)
+            (q3) edge[bend right=25,korange] node[lbl,swap] {$a$} (q2);
+  \begin{scope}[shift={(0.3,-4.6)},font=\ttfamily\small]
+    \node[anchor=west,kviolet] at (0,0) {S ::= E \$};
+    \node[anchor=west] at (0,-0.5) {E ::= T \{ + T \}};
+    \node[anchor=west] at (0,-1.0) {T ::= F \{ * F \}};
+    \node[anchor=west,korange] at (0,-1.5) {F ::= num | ( E )};
+  \end{scope}
+  \begin{scope}[shift={(6.2,-4.3)},level distance=9mm,
+      every node/.style={circle,draw=kviolet,fill=white,line width=0.9pt,minimum size=6.5mm,inner sep=0pt,font=\small},
+      level 1/.style={sibling distance=18mm},level 2/.style={sibling distance=10mm},
+      edge from parent/.style={draw,line width=0.8pt}]
+    \node[draw=korange,fill=korange!12] {$+$}
+      child {node {$5$}}
+      child {node[draw=korange,fill=korange!12] {$*$}
+        child {node {$7$}}
+        child {node {$x$}}};
+  \end{scope}
+\end{tikzpicture}}
+
+\maketoc
+
+% ===================== 1 =====================
+\section{Цепочки и языки}
+
+\textbf{Первичное понятие:} символ.
+
+\begin{opr}
+\term{Алфавит} — конечный набор символов. Обычно обозначается $\Sigma\ (V)$.
+\end{opr}
+\begin{opr}
+\term{Цепочка} символов в алфавите $\Sigma$ — любая конечная последовательность в алфавите $\Sigma$.
+\end{opr}
+\begin{opr}
+\term{Пустая цепочка} — цепочка, не содержащая символов. Обозначается $\varepsilon$.
+\end{opr}
+
+\textbf{Обозначения:} буквы — $a,\ b,\ c,\ 0,\ 1,\ 2$; цепочки — $\alpha,\ \beta,\ \gamma,\ \xi$.
+
+\begin{opr}
+\term{Конкатенация} цепочек $\alpha$ и $\beta$ — это $\alpha\beta$: цепочка, в которой сначала записаны символы $\alpha$, потом $\beta$.
+\end{opr}
+\begin{opr}
+\term{Реверс} цепочки $\alpha$: $\alpha^R=a_n\cdots a_1$, если $\alpha=a_1\dots a_n$.
+\end{opr}
+\begin{opr}
+\term{Степень} цепочки $\alpha$: $\alpha^n=\underbrace{\alpha\alpha\dots\alpha}_{n}$.
+\end{opr}
+\begin{opr}
+$|\alpha|$ — \term{длина} цепочки (количество символов); $|\alpha|_a$ — количество символов $a$ в $\alpha$.
+\end{opr}
+\begin{opr}
+$\Sigma^*$ — множество всех цепочек, состоящих из символов $\Sigma$. Здесь $^*$ — \term{звёздочка Клини}.
+Например, при $\Sigma=\{0,1\}$:
+\[
+\Sigma^*=\{\varepsilon,\ 0,\ 1,\ 00,\ 01,\ 10,\ 11,\ 000,\dots\}
+\]
+\end{opr}
+\begin{opr}
+$\Sigma^+$ — множество всех \textbf{непустых} цепочек из символов $\Sigma$. Здесь $^+$ — \term{плюс Клини}, и $\Sigma^+=\Sigma^*\setminus\{\varepsilon\}$.
+\end{opr}
+\begin{opr}
+\term{Язык} $L$ над алфавитом $\Sigma$: $L\subseteq\Sigma^*$.
+\end{opr}
+\begin{opr}
+\term{Декартово произведение}: $A\times B=\{(a,b)\mid a\in A,\ b\in B\}$.
+\end{opr}
+
+% ===================== 2 =====================
+\section{Грамматики}
+
+\subsection{Определение грамматики и пример вывода}
+
+\begin{opr}
+\term{Грамматика} $G$ — это четвёрка объектов $G=\langle T,N,P,S\rangle$, где
+\begin{itemize}
+\item $T$ — множество \term{терминалов} (\emph{символы алфавита});
+\item $N$ — множество \term{нетерминалов} (\emph{промежуточные символы}), причём $T\cap N=\varnothing$;
+\item $P$ — множество \term{правил вывода}: $\alpha\rul\beta\in P$, где $\alpha\in(T\cup N)^+$ содержит нетерминалы, а $\beta\in(T\cup N)^*$;
+\item $S$ — \term{стартовый символ}, $S\in N$.
+\end{itemize}
+\end{opr}
+
+\textbf{Обозначения.} Нетерминалы: $A,\ B,\ C$.
+
+\textbf{Пример.} $G:\ T=\{0,1\},\ N=\{S,A\}$,
+\[
+P:\ \begin{cases}S\rul0A1\\ 0A\rul00A1\\ A\rul\varepsilon\end{cases}
+\]
+Цепочка вывода:
+\[
+S\Rightarrow0A1\Rightarrow\overbrace{0}^{\xi_1}\overbrace{0A1}^{\gamma}\overbrace{1}^{\xi_2}\Rightarrow00\overbrace{0A1}^{\delta}11\Rightarrow\dots
+\]
+что даёт последовательно $01$, $0011$, $0^31^3$. Значит, $L=\{0^n1^n\mid n\ge1\}$ — язык, порождаемый грамматикой $G$.
+Эквивалентная грамматика: $P':\ S\rul0S1\mid01$.
+
+\subsection{Выводимость и сентенциальные формы}
+
+\begin{opr}
+$\beta\in(T\cup N)^*$ \term{непосредственно выводима} из $\alpha\in(T\cup N)^+$ в грамматике $G$ (обозначение $\alpha\Rightarrow_G\beta$),
+если $\alpha=\xi_1\gamma\xi_2$, $\beta=\xi_1\delta\xi_2$ и правило $\gamma\rul\delta\in P$.
+\end{opr}
+\begin{opr}
+$\beta\in(T\cup N)^*$ \term{выводима} из $\alpha\in(T\cup N)^+$ в $G$ (обозначение $\alpha\Rightarrow^*_G\beta$), если существуют
+$\gamma_1,\dots,\gamma_n$ такие, что $\alpha\Rightarrow\gamma_1\Rightarrow\dots\Rightarrow\gamma_n\Rightarrow\beta$.
+\end{opr}
+\begin{opr}
+Язык, \term{порождаемый грамматикой} $G$: $L(G)=\{\alpha\in T^*\mid S\Rightarrow^*_G\alpha\}$.
+\end{opr}
+\begin{opr}
+\term{Сентенциальная форма} — цепочка $\alpha\in(T\cup N)^*$, выводимая из $S$.
+\end{opr}
+
+\subsection{Эквивалентность грамматик}
+
+\begin{opr}
+$G_1$ и $G_2$ называются \term{эквивалентными}, если $L(G_1)=L(G_2)$.
+\end{opr}
+\begin{opr}
+$G_1$ и $G_2$ называются \term{почти эквивалентными}, если $L(G_1)\cup\{\varepsilon\}=L(G_2)\cup\{\varepsilon\}$.
+\end{opr}
+
+% ===================== 3 =====================
+\section{Классификация Хомского}
+
+\subsection{Типы грамматик}
+
+\begin{itemize}
+\item \textbf{Тип 0.} Все возможные.
+\item \textbf{Тип 1.}
+  \begin{itemize}
+  \item \term{Неукорачивающие.} Правила вывода не укорачивают слово: $\alpha\rul\beta$, $|\alpha|\le|\beta|$.
+  \item \term{Контекстно-зависимые.} $\alpha A\beta\rul\alpha\gamma\beta$, $|\gamma|>0$.
+  \end{itemize}
+\item \textbf{Тип 2.} \term{Контекстно-свободные} (КС). Все правила вывода имеют вид $A\rul\gamma$.
+\item \textbf{Тип 3.}
+  \begin{itemize}
+  \item \term{Праволинейная}: $A\rul aB$ и $A\rul a$, где $A,B\in N$, $a\in T$.
+  \item \term{Леволинейная}: $A\rul Ba$ и $A\rul a$.
+  \end{itemize}
+\end{itemize}
+
+\begin{zam}
+В неукорачивающих грамматиках может быть правило $S\rul\varepsilon$, если $S$ не встречается в правых частях правил.
+\end{zam}
+
+\subsection{Тип языка и обозначения}
+
+\begin{opr}
+\term{Типом языка} называется максимальный тип грамматики, задающей язык.
+\end{opr}
+
+\sidefig[0.42]{
+\begin{itemize}
+\item Тип 0 — формальные языки, $FL$;
+\item Тип 1 — контекстно-зависимые языки, $CDL$;
+\item Тип 2 — контекстно-свободные языки, $CFL$;
+\item Тип 3 — регулярные языки, $REG$.
+\end{itemize}
+}{
+\begin{tikzpicture}[scale=0.9]
+  \fill[kviolet!6] (0,0) ellipse (3.6 and 1.9);   \draw[kviolet,line width=1pt] (0,0) ellipse (3.6 and 1.9);
+  \fill[kviolet!13] (0.5,-0.2) ellipse (2.8 and 1.4); \draw[kviolet,line width=1pt] (0.5,-0.2) ellipse (2.8 and 1.4);
+  \fill[korange!14] (0.9,-0.35) ellipse (2.0 and 0.95); \draw[korange,line width=1pt] (0.9,-0.35) ellipse (2.0 and 0.95);
+  \fill[korange!32] (1.2,-0.45) ellipse (1.1 and 0.45); \draw[korange,line width=1pt] (1.2,-0.45) ellipse (1.1 and 0.45);
+  \node[font=\footnotesize] at (-2.95,0) {тип 0};
+  \node[font=\footnotesize] at (-1.7,-0.2) {тип 1};
+  \node[font=\footnotesize] at (-0.5,-0.35) {тип 2};
+  \node[font=\footnotesize] at (1.2,-0.45) {тип 3};
+\end{tikzpicture}}
+
+\subsection{Как определить тип грамматики}
+\begin{enumerate}
+\item Только один нетерминал слева — тип 2 или 3, иначе тип 0 или 1.
+\item Все правила односторонние (нетерминал с одной стороны) — тип 3, иначе тип 2.
+\end{enumerate}
+
+\begin{zam}[Почему $a^nb^n$ контекстно-свободный, но не регулярный]
+Нам нужно уметь считать, сколько $a$ мы поставили. Если ставить сначала $a$, потом $b$ по $n$ раз, число нетерминалов
+не будет конечным — подходит только изменение строки из середины.
+\end{zam}
+
+% ===================== 4 =====================
+\section{Структура вывода в КС-грамматиках}
+
+\subsection{Левый и правый вывод}
+
+\begin{opr}
+\term{Левый} и \term{правый вывод} — вывод, в котором на каждом шаге раскрывается соответственно самый левый или самый правый нетерминал.
+\end{opr}
+
+Для грамматики $S\rul SS\mid a\mid b$ построим вывод слова $w=aaba$.
+
+Левый вывод (раскрываем самый левый нетерминал):
+\[
+\underline{S}\rul\underline{S}S\rul\underline{S}SS\rul\underline{S}SSS\rul a\underline{S}SS\rul aa\underline{S}S\rul aab\underline{S}\rul aaba
+\]
+Правый вывод (раскрываем самый правый нетерминал):
+\[
+\underline{S}\rul S\underline{S}\rul SS\underline{S}\rul SSS\underline{S}\rul SS\underline{S}a\rul S\underline{S}ba\rul\underline{S}aba\rul aaba
+\]
+
+\subsection{Дерево вывода. Неоднозначность}
+
+\begin{opr}
+\term{Дерево вывода} — дерево, узлами которого являются нетерминалы, а листьями — терминалы. Дерево вывода не единственно.
+\end{opr}
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={circle,draw=kviolet,fill=kviolet!7,line width=0.9pt,minimum size=7mm,inner sep=0pt,
+    l sep=5mm,s sep=6mm,edge={line width=0.8pt}},
+  [$S$ [$S$ [$S$ [$S$ [$a$,draw=korange,fill=korange!12]] [$S$ [$a$,draw=korange,fill=korange!12]]] [$S$ [$b$,draw=korange,fill=korange!12]]]
+       [$S$ [$a$,draw=korange,fill=korange!12]]]
+\end{forest}
+\caption{Дерево вывода слова $aaba$ в грамматике $S\rul SS\mid a\mid b$}
+\end{figure}
+
+\begin{opr}
+Грамматика называется \term{неоднозначной}, если у неё существует несколько деревьев вывода для некоторой цепочки.
+В ином случае грамматика называется \term{однозначной}.
+\end{opr}
+
+\subsection{Недостижимые и бесплодные символы}
+
+\begin{opr}
+\term{Недостижимые символы} — нетерминалы, которые не выводятся из $S$.
+\end{opr}
+\begin{opr}
+\term{Бесплодные символы} — нетерминалы, из которых не выводятся терминальные цепочки.
+\end{opr}
+
+\textbf{Пример.}
+\[
+\begin{array}{l}
+S\rul aAB\mid E\\ A\rul dDA\\ B\rul bE\mid f\\ C\rul cAB\mid dSD\mid a\\ D\rul eA\\ E\rul fA\mid g
+\end{array}
+\]
+Недостижимые: $C$. Бесплодные: $A,\ D$.
+
+% ===================== 5 =====================
+\section{Преобразование грамматик}
+
+\subsection{Очистка грамматики}
+
+\begin{kvb}{Поиск}
+\begin{enumerate}
+\item \textbf{Недостижимые:}
+  \begin{enumerate}
+  \item строим $K_0=\{S\}$;
+  \item строим $K_i=K_{i-1}\cup\{B\mid\exists A\rul\xi_1B\xi_2,\ A\in K_{i-1}\}$;
+  \item конец, когда $K_i=K_{i-1}$.
+  \end{enumerate}
+\item \textbf{Бесплодные:}
+  \begin{enumerate}
+  \item строим $K_0=\Sigma$ (то есть $T$);
+  \item строим $K_i=K_{i-1}\cup\{A\mid\exists A\rul\gamma,\ \gamma\in K_{i-1}^*\}$;
+  \item конец, когда $K_i=K_{i-1}$.
+  \end{enumerate}
+\end{enumerate}
+\end{kvb}
+
+\begin{kob}{Удаление}
+\begin{enumerate}
+\item Удаляем бесплодные.
+\item Удаляем недостижимые.
+\end{enumerate}
+\end{kob}
+
+\textbf{Пример а).}
+\[
+\begin{array}{l}
+S\rul aABS\mid bCACd\\ A\rul bAB\mid cSA\mid cCC\\ B\rul bAB\mid cSB\\ C\rul cS\mid c
+\end{array}
+\]
+Плодовитые:
+\[
+\begin{array}{l}
+K_0=\{a,b,c,d\}\\ K_1=\{a,b,c,d,C\}\\ K_2=\{a,b,c,d,C,A\}\\ K_3=\{a,b,c,d,C,A,S\}\\ K_4=K_3\Rightarrow\text{конец}
+\end{array}
+\]
+$\Rightarrow$ бесплодные: $B$. Тогда
+\[
+P:\ \begin{array}{l}S\rul bCACd\\ A\rul cSA\mid cCC\\ C\rul cS\mid c\end{array}
+\]
+Достижимые: $K_0=\{S\}$, $K_1=\{S,C,A\}$, $K_2=K_1\Rightarrow$ конец $\Rightarrow$ недостижимых нет.
+
+\textbf{Пример б).}
+\[
+\begin{array}{l}
+S\rul ab\mid aA\\ A\rul bAB\mid aA\\ B\rul aB\mid b
+\end{array}
+\]
+Плодовитые: $K_0=\{a,b\}$, $K_1=\{a,b,S,B\}$, $K_2=K_1\Rightarrow$ конец $\Rightarrow$ бесплодные: $A$. Тогда
+$P:\ S\rul ab,\ B\rul aB\mid b$.
+
+Достижимые: $K_0=\{S\}$, $K_1=K_0\Rightarrow$ конец $\Rightarrow$ недостижимые: $B$, и остаётся $P:\ S\rul ab$.
+
+\subsection{Избавление от \texorpdfstring{$\varepsilon$}{ε}-правил}
+
+\[
+\begin{array}{l}A\rul aB\mid\varepsilon\\ C\rul DABA\end{array}
+\qquad\Longrightarrow\qquad
+\begin{array}{l}A\rul aB\\ C\rul DABA\mid DB\mid DAB\mid DBA\end{array}
+\]
+
+\begin{kvb}{Алгоритм}
+\begin{enumerate}
+\item Строим $N'$ — множество \term{«схлопывающихся»} нетерминалов: $N'=\{A\in N\mid A\rul^*\varepsilon\}$.
+\item Убираем правила вида $A\rul\varepsilon$. Если $\varepsilon\in L$, то вводим новый стартовый символ $S'$ с правилом $S'\rul S\mid\varepsilon$.
+\item Для всех правил вида $B\rul\alpha_0A_1\alpha_1A_2\alpha_2\dots A_n\alpha_n$, где $A_i\in N'$ и $\alpha_i\in(T\cup(N\setminus N'))^*$,
+  добавляем правила со всеми возможными выбрасываниями $A_i$:
+  \[
+  \begin{array}{l}
+  B\rul\alpha_0\alpha_1\dots\alpha_n\\ B\rul\alpha_0\alpha_1\dots A_n\alpha_n\\ \dots\\ B\rul\alpha_0A_1\alpha_1A_2\dots A_n\alpha_n
+  \end{array}
+  \]
+\item Удалить бесплодные и недостижимые.
+\end{enumerate}
+\end{kvb}
+
+% ===================== 6 =====================
+\section{Компиляция на практике}
+
+\begin{kob}{Как это используется на практике}
+Для компиляторов используют регулярные (тип 3) и контекстно-свободные (тип 2) языки.
+\end{kob}
+
+\subsection{Этапы компиляции}
+
+\begin{enumerate}
+\item \textbf{Лексический анализ.} Текст $\rul$ поток токенов:
+  \[
+  \texttt{if(a<5)}\ \rul\
+  \underset{\text{служеб. слово}}{\tok{if}}\ \tok{(}\ \underset{\text{имя}}{\tok{a}}\ \underset{\text{опер.}}{\tok{<}}\ \underset{\text{число}}{\tok{5}}\ \tok{)}
+  \]
+\item \textbf{Синтаксический анализ.} Поток токенов $\rul$ синтаксическое дерево (рис.~\ref{fig:if}).
+\item \textbf{Семантический анализ.} Проверка на смысловую корректность.
+\item \textbf{Генерация кода.}
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={draw=kviolet,fill=kviolet!7,line width=0.9pt,rounded corners=2pt,font=\ttfamily,
+    minimum height=6mm,minimum width=8mm,inner sep=2pt,l sep=6mm,s sep=8mm,edge={line width=0.8pt}},
+  [if,draw=korange,fill=korange!12 [<\vphantom{p} [a] [5]] [тело,font=\normalfont\itshape,draw=kgray,fill=white,dashed]]
+\end{forest}
+\caption{Синтаксическое дерево для \texttt{if(a<5)}}\label{fig:if}
+\end{figure}
+
+\subsection{Подходы к компиляции}
+
+\begin{enumerate}
+\item \textbf{Традиционная компиляция.} $\texttt{file.cpp}\rul\texttt{file.exe}$ (можно сразу запустить). Быстрые компиляция и работа.
+\item \textbf{JIT-компиляция} (JIT — Just In Time). $\texttt{file.cs}\rul\text{IL}$ (промежуточный язык), компиляция в машинные коды
+  при запуске. Медленная компиляция, быстрая работа, безопасность.
+\item \textbf{Интерпретация.} \texttt{file.py}. Медленная работа, кроссплатформенность, безопасность.
+\end{enumerate}
+
+\subsection{Распознающие формализмы}
+
+Грамматика — \term{порождающий} формализм. Ему двойственны \term{распознающие}:
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{ll}
+\toprule
+{\hfont\color{kviolet}Тип языка} & {\hfont\color{kviolet}Распознающий формализм}\\
+\midrule
+Тип 3 & Конечные автоматы\\
+Тип 2 & МП-автоматы (автоматы с магазинной памятью)\\
+Тип 1 & ЛОА (линейно ограниченный автомат)\\
+Тип 0 & Машина Тьюринга\\
+\bottomrule
+\end{tabular}
+\caption{Порождающие и распознающие формализмы}
+\end{table}
+
+% ===================== 7 =====================
+\section{Регулярные языки}
+
+\subsection{НКА и ДКА}
+
+\begin{opr}
+\term{Недетерминированный конечный автомат (НКА)} — пятёрка объектов $\langle Q,\Sigma,\delta,q_0,F\rangle$:
+\begin{itemize}
+\item $Q$ — конечное множество состояний;
+\item $\Sigma$ — алфавит;
+\item $\delta:\ Q\times(\Sigma\cup\{\varepsilon\})\rul2^Q$ (множество всех подмножеств $Q$) — функция перехода (переход не однозначен);
+\item $q_0\in Q$ — начальное состояние;
+\item $F\subseteq Q$ — множество конечных состояний.
+\end{itemize}
+\end{opr}
+
+\begin{opr}
+\term{Детерминированный конечный автомат (ДКА)} — пятёрка объектов $\langle Q,\Sigma,\delta,q_0,F\rangle$:
+\begin{itemize}
+\item $Q$ — конечное множество состояний;
+\item $\Sigma$ — алфавит;
+\item $\delta:\ Q\times\Sigma\rul Q\cup\{\varnothing\}$ — функция перехода (переход всегда однозначен);
+\item $q_0\in Q$ — начальное состояние;
+\item $F\subseteq Q$ — множество конечных состояний.
+\end{itemize}
+\end{opr}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fa,node distance=3cm]
+  \node[state,initial,label={[kviolet,font=\small]above:$S$}] (q0) {$q_0$};
+  \node[state,right=of q0,label={[kviolet,font=\small]above left:$B$}] (q1) {$q_1$};
+  \node[state,below=2.2cm of q0,label={[kviolet,font=\small]left:$A$}] (q2) {$q_2$};
+  \node[state,right=of q2,label={[kviolet,font=\small]below:$C$}] (q3) {$q_3$};
+  \node[state,accepting,right=3.2cm of q3] (q4) {$q_4$};
+  \node[draw=korange,text=korange,rounded corners=2pt,font=\hfont\small,right=1.4cm of q1] {НКА};
+  \path[->] (q0) edge node[lbl] {$0,1$} (q1)
+            (q0) edge node[lbl,swap] {$0$} (q2)
+            (q2) edge[bend left=12] node[lbl] {$1$} (q1)
+            (q1) edge[bend left=12] node[lbl] {$0$} (q2)
+            (q1) edge[loop above] node[lbl] {$0$} ()
+            (q1) edge node[lbl] {$1$} (q3)
+            (q2) edge[loop below] node[lbl] {$1$} ()
+            (q2) edge node[lbl,swap] {$0$} (q3)
+            (q3) edge[korange] node[lbl] {$\perp$} (q4);
+  \node[font=\footnotesize,korange,below=2pt] at ($(q3)!0.5!(q4)$) {терминальный переход};
+\end{tikzpicture}
+\caption{Автомат к примеру 1}
+\end{figure}
+
+\begin{minipage}[t]{0.48\linewidth}
+Праволинейная грамматика:
+\[
+\begin{array}{l}
+S\rul0A\mid0B\mid1B\\ A\rul1A\mid1B\mid0C\\ B\rul0A\mid0B\mid1C\\ C\rul\perp
+\end{array}
+\]
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+Леволинейная грамматика:
+\[
+\begin{array}{l}
+D\rul C\perp\\ C\rul B1\mid A0\\ B\rul B0\mid A1\mid0\mid1\\ A\rul A1\mid B0\mid0
+\end{array}
+\]
+\end{minipage}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fa,node distance=3.2cm]
+  \node[state,initial] (S) {$S$};
+  \node[state,accepting,right=of S] (A) {$A$};
+  \node[state,right=of A] (B) {$B$};
+  \path[->] (S) edge[bend left=20] node[lbl] {$a$} (A)
+            (A) edge[bend left=20] node[lbl] {$b$} (S)
+            (A) edge[bend left=20] node[lbl] {$a$} (B)
+            (B) edge[bend left=20] node[lbl] {$b$} (A)
+            (S) edge[loop below] node[lbl] {$b$} ()
+            (B) edge[loop below] node[lbl] {$b$} ();
+\end{tikzpicture}
+\caption{Автомат к примеру 2}
+\end{figure}
+
+\begin{minipage}[t]{0.48\linewidth}
+Праволинейная грамматика:
+\[
+\begin{array}{l}
+S\rul aA\mid bS\mid a\\ A\rul bS\mid aB\\ B\rul bB\mid bA\mid b
+\end{array}
+\]
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+Леволинейная грамматика:
+\[
+\begin{array}{l}
+A\rul Sa\mid Bb\mid a\\ B\rul Ba\mid Aa\\ S\rul Sb\mid Ab\mid b
+\end{array}
+\]
+\end{minipage}
+
+\subsection{Автоматы и линейные грамматики}
+
+Пусть есть автомат $\langle Q,\Sigma,\gamma,q_0,F\rangle$ и грамматика $\langle T,N,S,P\rangle$. Тогда можно сопоставить:
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Для праволинейных:}
+\begin{itemize}
+\item $Q\rul N$, \quad $\Sigma\rul T$,
+\item $q_0\rul S$, \quad $F\rul -$,
+\item $\gamma\rul P$.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Для леволинейных:}
+\begin{itemize}
+\item $Q\rul N$, \quad $\Sigma\rul T$,
+\item $q_0\rul -$, \quad $F\rul S$,
+\item $\gamma\rul P$.
+\end{itemize}
+\end{minipage}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fa,node distance=1.9cm]
+  % праволинейные
+  \node[state] (A1) {$A$}; \node[state,right=of A1,dashed] (B1) {$B$};
+  \node[right=1.4cm of B1] (r1) {$A\rul\alpha B$};
+  \node[state,below=1.2cm of A1] (A2) {$A$}; \node[state,accepting,right=of A2] (B2) {$B$};
+  \node[right=1.4cm of B2] (r2) {$A\rul\alpha$};
+  \path[->] (A1) edge node[lbl] {$\alpha$} (B1) (A2) edge node[lbl] {$\alpha$} (B2);
+  \node[font=\Large,kviolet] at ($(B1)!0.5!(B2)+(1.0,0)$) {$\Longleftrightarrow$};
+  \node[font=\hfont\small,kviolet] at ($(A1)!0.5!(r1)+(0,1.0)$) {праволинейная};
+  % леволинейные
+  \begin{scope}[xshift=8.2cm]
+  \node[state] (C1) {$A$}; \node[state,right=of C1] (D1) {$B$};
+  \draw[->,dashed,kgray] ($(C1)+(-1.2,0)$) -- (C1);
+  \node[right=1.4cm of D1] (s1) {$B\rul A\alpha$};
+  \node[state,initial,below=1.2cm of C1] (C2) {$A$}; \node[state,accepting,right=of C2] (D2) {$B$};
+  \node[right=1.4cm of D2] (s2) {$B\rul\alpha$};
+  \path[->] (C1) edge node[lbl] {$\alpha$} (D1) (C2) edge node[lbl] {$\alpha$} (D2);
+  \node[font=\Large,korange] at ($(D1)!0.5!(D2)+(1.0,0)$) {$\Longleftrightarrow$};
+  \node[font=\hfont\small,korange] at ($(C1)!0.5!(s1)+(0,1.0)$) {леволинейная};
+  \end{scope}
+\end{tikzpicture}
+\caption{Соответствие автомата и линейной грамматики (пунктирное состояние — любое)}
+\end{figure}
+
+\needspace{10\baselineskip}\textbf{Пример 3.}
+\sidefig[0.55]{
+\[
+\begin{array}{l}
+S\rul aS\mid bN\\ N\rul aN\mid aK\mid b\\ K\rul a\mid bK
+\end{array}
+\]
+}{
+\begin{tikzpicture}[fa,node distance=2.2cm]
+  \node[state,initial] (S) {$S$};
+  \node[state,right=of S] (N) {$N$};
+  \node[state,right=of N] (K) {$K$};
+  \node[state,accepting,below=1.6cm of N] (F) {$\perp$};
+  \path[->] (S) edge node[lbl] {$b$} (N) (N) edge node[lbl] {$a$} (K)
+            (N) edge node[lbl,swap] {$b$} (F) (K) edge node[lbl] {$a$} (F)
+            (S) edge[loop above] node[lbl] {$a$} () (N) edge[loop above] node[lbl] {$a$} () (K) edge[loop above] node[lbl] {$b$} ();
+\end{tikzpicture}}
+
+\needspace{10\baselineskip}\textbf{Пример 4.}
+\sidefig[0.55]{
+\[
+\begin{array}{l}
+S\rul aN\mid kS\mid cS\\ N\rul a\mid cN\mid cA\mid k\\ A\rul b\mid bN\mid eA\mid d\mid cS
+\end{array}
+\]
+}{
+\begin{tikzpicture}[fa,node distance=2.4cm]
+  \node[state,initial] (S) {$S$};
+  \node[state,right=of S] (N) {$N$};
+  \node[state,below=1.9cm of $(S)!0.5!(N)$] (A) {$A$};
+  \node[state,accepting,right=2.6cm of A] (F) {$\perp$};
+  \path[->] (S) edge node[lbl] {$a$} (N)
+            (N) edge[bend left=15] node[lbl] {$c$} (A)
+            (A) edge[bend left=15] node[lbl] {$b$} (N)
+            (A) edge[bend left=15] node[lbl] {$c$} (S)
+            (N) edge node[lbl] {$a,k$} (F)
+            (A) edge node[lbl,swap] {$b,d$} (F)
+            (S) edge[loop above] node[lbl] {$k,c$} ()
+            (N) edge[loop above] node[lbl] {$c$} ()
+            (A) edge[loop below] node[lbl] {$e$} ();
+\end{tikzpicture}}
+
+\needspace{10\baselineskip}\textbf{Пример 5} (леволинейная грамматика).
+\sidefig[0.55]{
+\[
+\begin{array}{l}
+S\rul S0\mid S1\mid P0\mid P1\\ P\rul N.\\ N\rul0\mid1\mid N0\mid N1
+\end{array}
+\]
+}{
+\begin{tikzpicture}[fa,node distance=1.5cm]
+  \node[state,initial] (H) {$\perp$};
+  \node[state,right=of H] (N) {$N$};
+  \node[state,right=of N] (P) {$P$};
+  \node[state,accepting,right=of P] (S) {$S$};
+  \path[->] (H) edge node[lbl] {$0,1$} (N) (N) edge node[lbl] {$.$} (P) (P) edge node[lbl] {$0,1$} (S)
+            (N) edge[loop above] node[lbl] {$0,1$} () (S) edge[loop above] node[lbl] {$0,1$} ();
+\end{tikzpicture}}
+
+\subsection{Построение ДКА}
+
+Разберём на примере 3. Состояния ДКА — множества состояний НКА:
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c|c}
+\toprule
+{\hfont\color{kviolet}ДКА} & {\hfont\color{kviolet}НКА} & $a$ & $b$\\
+\midrule
+$Q_0$ & $S$ & $Q_0$ & $Q_1$\\
+$Q_1$ & $N$ & $Q_2$ & $Q_3$\\
+$Q_2$ & $N,K$ & $Q_4$ & $Q_5$\\
+$Q_3$ & $\perp$ & — & —\\
+$Q_4$ & $N,K,\perp$ & $Q_4$ & $Q_5$\\
+$Q_5$ & $K,\perp$ & $Q_3$ & $Q_6$\\
+$Q_6$ & $K$ & $Q_3$ & $Q_6$\\
+\bottomrule
+\end{tabular}
+\caption{Построение ДКА по НКА из примера 3}
+\end{table}
+
+\needspace{10\baselineskip}\textbf{Пример 6.} НКА задан таблицей переходов:
+
+\begin{minipage}[c]{0.45\linewidth}\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c|c|c}
+\toprule
+ & $\varepsilon$ & $a$ & $b$ & $c$\\
+\midrule
+$\rul p$ & $\varnothing$ & $\{p\}$ & $\{q\}$ & $\{r\}$\\
+$q$ & $\{p\}$ & $\{q\}$ & $\{r\}$ & $\varnothing$\\
+$^*r$ & $\{q\}$ & $\{r\}$ & $\varnothing$ & $\{p\}$\\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.5\linewidth}\centering
+\begin{tikzpicture}[fa,node distance=2.6cm]
+  \node[state,initial] (p) {$p$};
+  \node[state,right=of p] (q) {$q$};
+  \node[state,accepting,below=1.8cm of $(p)!0.5!(q)$] (r) {$r$};
+  \path[->] (p) edge node[lbl] {$b$} (q)
+            (q) edge[bend right=35] node[lbl,swap] {$\varepsilon$} (p)
+            (p) edge[bend left=12] node[lbl] {$c$} (r)
+            (r) edge[bend left=25] node[lbl] {$c$} (p)
+            (q) edge[bend left=12] node[lbl] {$b$} (r)
+            (r) edge[bend right=25] node[lbl,swap] {$\varepsilon$} (q)
+            (p) edge[loop above] node[lbl] {$a$} ()
+            (q) edge[loop above] node[lbl] {$a$} ()
+            (r) edge[loop below] node[lbl] {$a$} ();
+\end{tikzpicture}
+\end{minipage}
+
+\medskip
+\begin{minipage}[c]{0.45\linewidth}\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c|c|c}
+\toprule
+{\hfont\color{kviolet}ДКА} & {\hfont\color{kviolet}НКА} & $a$ & $b$ & $c$\\
+\midrule
+$\rul Q_0$ & $p$ & $Q_0$ & $Q_1$ & $Q_2$\\
+$Q_1$ & $q,p$ & $Q_1$ & $Q_2$ & $Q_2$\\
+$^*Q_2$ & $q,p,r$ & $Q_2$ & $Q_2$ & $Q_2$\\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.5\linewidth}\centering
+\begin{tikzpicture}[fa,node distance=2.6cm]
+  \node[state,initial] (Q0) {$Q_0$};
+  \node[state,right=of Q0] (Q1) {$Q_1$};
+  \node[state,accepting,below=1.8cm of $(Q0)!0.5!(Q1)$] (Q2) {$Q_2$};
+  \path[->] (Q0) edge node[lbl] {$b$} (Q1) (Q0) edge node[lbl,swap] {$c$} (Q2) (Q1) edge node[lbl] {$b,c$} (Q2)
+            (Q0) edge[loop above] node[lbl] {$a$} () (Q1) edge[loop above] node[lbl] {$a$} () (Q2) edge[loop below] node[lbl] {$a,b,c$} ();
+\end{tikzpicture}
+\end{minipage}
+
+\needspace{8\baselineskip}\textbf{Пример 7.}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fa,node distance=3cm]
+  \node[state,initial] (S) {$S$};
+  \node[state,right=of S] (B) {$B$};
+  \node[state,accepting,below=1.9cm of S] (A) {$A$};
+  \node[state,below=1.9cm of B] (C) {$C$};
+  \node[state,accepting,right=2.8cm of $(B)!0.5!(C)$] (D) {$D$};
+  \path[->] (S) edge[bend left=15] node[lbl] {$a$} (B)
+            (S) edge[bend right=15] node[lbl,swap] {$\varepsilon$} (B)
+            (S) edge node[lbl,swap] {$a$} (A)
+            (B) edge node[lbl,swap,pos=0.35] {$b$} (A)
+            (B) edge node[lbl] {$b$} (C)
+            (B) edge node[lbl] {$a$} (D)
+            (A) edge node[lbl,swap] {$a$} (C)
+            (C) edge node[lbl,swap] {$\varepsilon$} (D)
+            (S) edge[loop above] node[lbl] {$b$} ()
+            (B) edge[loop above] node[lbl] {$b$} ();
+\end{tikzpicture}
+\caption{НКА к примеру 7}
+\end{figure}
+
+\begin{minipage}[c]{0.45\linewidth}\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c|c|c|c}
+\toprule
+{\hfont\color{kviolet}ДКА} & {\hfont\color{kviolet}НКА} & $a$ & $b$\\
+\midrule
+$\rul Q_0$ & $SB$ & $Q_1$ & $Q_2$\\
+$^*Q_1$ & $ABD$ & $Q_3$ & $Q_4$\\
+$^*Q_2$ & $SABCD$ & $Q_4$ & $Q_2$\\
+$^*Q_3$ & $CD$ & $\varnothing$ & $\varnothing$\\
+$^*Q_4$ & $ABCD$ & $Q_3$ & $Q_4$\\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.52\linewidth}\centering
+\begin{tikzpicture}[fa,node distance=2.3cm]
+  \node[state,initial] (Q0) {$Q_0$};
+  \node[state,accepting,right=of Q0] (Q1) {$Q_1$};
+  \node[state,accepting,right=of Q1] (Q3) {$Q_3$};
+  \node[state,accepting,below=1.6cm of Q0] (Q2) {$Q_2$};
+  \node[state,accepting,below=1.6cm of Q1] (Q4) {$Q_4$};
+  \path[->] (Q0) edge node[lbl] {$a$} (Q1) (Q1) edge node[lbl] {$a$} (Q3)
+            (Q0) edge node[lbl,swap] {$b$} (Q2) (Q1) edge node[lbl] {$b$} (Q4)
+            (Q2) edge node[lbl,swap] {$a$} (Q4) (Q4) edge node[lbl,swap] {$a$} (Q3)
+            (Q2) edge[loop below] node[lbl] {$b$} () (Q4) edge[loop below] node[lbl] {$b$} ();
+\end{tikzpicture}
+\end{minipage}
+
+\medskip
+\begin{minipage}[t]{0.48\linewidth}
+Праволинейная грамматика (убрали $Q_3$, т.\,к. бесплодное):
+\[
+\begin{array}{l}
+Q_0\rul aQ_1\mid bQ_2\mid a\mid b\\ Q_1\rul bQ_4\mid a\mid b\\ Q_2\rul aQ_4\mid bQ_2\mid a\mid b\\ Q_4\rul bQ_4\mid a\mid b
+\end{array}
+\]
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+Леволинейная грамматика:
+\[
+\begin{array}{l}
+\perp\rul Q_1\mid Q_2\mid Q_3\mid Q_4\\ Q_3\rul Q_1a\mid Q_4a\\ Q_4\rul Q_4b\mid Q_2a\mid Q_1b\\ Q_2\rul Q_2b\mid b\\ Q_1\rul a
+\end{array}
+\]
+\end{minipage}
+
+\subsection{Операции над языками и регулярные выражения}
+
+\begin{opr}
+\term{Конкатенация} языков: $AB=\{\alpha\beta\mid\alpha\in A,\ \beta\in B\}$.
+\end{opr}
+\textbf{Пример.} $A=\{a,bb\}$, $B=\{ba,cbc\}$ $\Rightarrow$ $AB=\{aba,\ acbc,\ bbba,\ bbcbc\}$.
+
+\begin{opr}
+\term{Степень} языка: $L^n=\underbrace{LL\dots L}_{n}$, $L^0=\{\varepsilon\}$.
+\end{opr}
+\textbf{Пример.} $A=\{a,bb\}$: $A^3=\{aaa,\ aabb,\ abba,\ abbbb,\ bbaa,\ bbabb,\ bbbba,\ bbbbbb\}$.
+
+\begin{opr}
+\term{Замыкание Клини}: $L^*=\bigcup\limits_{n=0}^{\infty}L^n$.
+\end{opr}
+\textbf{Пример.} $A=\{a,bb\}$: $A^*=\{\varepsilon,\ a,\ bb,\ aa,\ abb,\ bba,\ bbbb,\dots\}$.
+
+\begin{opr}
+\term{Плюс Клини}: $L^+=\bigcup\limits_{n=1}^{\infty}L^n=LL^*$.
+\end{opr}
+
+\begin{opr}
+\term{Регулярное выражение} состоит из: $\varepsilon,\ \Sigma,\ (,\ ),\ ^*,\ |,\ \cdot,\ \varnothing$.
+\begin{enumerate}
+\item $\varnothing$, $\varepsilon$, $a$ ($a\in\Sigma$) — регулярные выражения.
+\item Если $\alpha$ и $\beta$ — регулярные, то $\alpha|\beta$, $\alpha\cdot\beta$, $\alpha^*$, $(\alpha)$ — регулярные.
+\item Других регулярных выражений нет.
+\end{enumerate}
+\end{opr}
+
+\begin{opr}
+Язык, задаваемый \term{регулярным выражением}:
+\begin{enumerate}
+\item $L(\varnothing)=\varnothing$, \quad $L(\varepsilon)=\{\varepsilon\}$, \quad $L(a)=\{a\}$;
+\item $L(\alpha\cdot\beta)=L(\alpha)L(\beta)$, \quad $L(\alpha^*)=L(\alpha)^*$, \quad $L((\alpha))=L(\alpha)$, \quad $L(\alpha|\beta)=L(\alpha)\cup L(\beta)$.
+\end{enumerate}
+\end{opr}
+
+\textbf{Пример.} Язык всех слов над $\{a,b\}$, заканчивающихся на $abb$. Регулярное выражение: $(a|b)^*\cdot a\cdot b\cdot b$.
+
+\subsection{Регулярные выражения на практике (PCRE)}
+
+Регулярное выражение — шаблон для поиска, проверки и замены текста. В библиотеках синтаксис богаче, чем в определении выше:
+есть обратные ссылки, которые выходят за рамки регулярных языков.
+
+\textbf{Диалекты:} POSIX (BRE, ERE; @grep@, @sed@), PCRE (Perl-Compatible Regular Expressions, самый богатый синтаксис).
+В C++ @std::regex@ использует ECMAScript, близкий к PCRE (но без lookbehind).
+
+\textbf{Функции в C++} (@<regex>@):
+\begin{itemize}
+\item @regex_match@ — проверка \textbf{полного} совпадения строки;
+\item @regex_search@ — поиск \textbf{первого} вхождения;
+\item @regex_replace@ — замена совпадающих частей.
+\end{itemize}
+Результат лежит в @std::smatch@ / @std::cmatch@: @res[0]@ — всё совпадение, @res[1]@, @res[2]@, \ldots{} — группы.
+
+\begin{zam}
+В строке C++ обратный слеш удваивается, проще писать raw-строку: @"\\d+"@ $\Rightarrow$ @R"(\d+)"@.
+\end{zam}
+
+\begin{opr}
+\term{Метасимволы} — символы со специальным смыслом:
+\begin{center}@. ^ $ * + ? ( ) [ ] { } | \@\end{center}
+Чтобы использовать метасимвол как обычный, его \term{экранируют}: @\.@, @\*@, @\\@.
+\end{opr}
+
+\begin{opr}
+\term{Одиночные метасимволы}:
+\begin{itemize}
+\item @.@ — любой символ, кроме @\n@;
+\item @^@ — начало строки, @$@ — конец строки;
+\item @\b@ — граница слова, @\B@ — не граница слова.
+\end{itemize}
+\end{opr}
+
+\begin{zam}
+@\b@ и @\w@ работают только для латиницы.
+\end{zam}
+
+\begin{opr}
+\term{Символьные классы} (заглавная буква — инверсия):
+\begin{itemize}
+\item @\s@ (@\S@) — пробельные символы;
+\item @\d@ (@\D@) — цифры 0–9;
+\item @\w@ (@\W@) — буквы, цифры, знак подчёркивания.
+\end{itemize}
+\end{opr}
+
+\begin{opr}
+\term{Перечисление} @[...]@ — один любой символ из набора, внутри можно использовать диапазоны: @[a-fA-F0-5]@.
+\term{Инвертированное} перечисление: @[^abc]@ — любой символ, кроме перечисленных. Внутри @[]@ метасимволы означают сами себя:
+@[.]@ — просто точка.
+\end{opr}
+
+\begin{opr}
+\term{Квантификаторы} — сколько раз повторять предыдущий символ или группу:
+\begin{itemize}
+\item @*@ — ноль или более повторений; @+@ — одно или более; @?@ — ноль или одно;
+\item @{n}@ — ровно $n$ раз; @{n,m}@ — от $n$ до $m$ раз; @{n,}@ — от $n$ до $\infty$ раз.
+\end{itemize}
+\end{opr}
+
+\begin{zam}
+Формы @{,m}@ нет: @a{,5}@ — это просто текст, для «от 0 до 5» пишем @a{0,5}@.
+\end{zam}
+
+\begin{opr}
+\term{Типы квантификации}:
+\begin{itemize}
+\item \textbf{жадная} (@+@, @*@, @?@, @{}@) — берёт самую длинную подстроку;
+\item \textbf{ленивая} (после квантификатора ставим @?@: @+?@, @*?@, @??@) — берёт самую короткую.
+\end{itemize}
+\end{opr}
+
+Например, на строке @<b>x</b>@ шаблон @<.+>@ захватит всю строку, а @<.+?>@ — только @<b>@.
+
+\subsection{Группировки}
+
+\begin{opr}
+\term{Группировки} ставятся в круглые скобки:
+\begin{itemize}
+\item @(...)@ — \textbf{группа с захватом}: запоминает подстроку (достаём по индексу);
+\item @(?:...)@ — \textbf{группа без захвата}: ничего не запоминает, просто делит шаблон на логические блоки;
+\item @|@ — «или», самый низкий приоритет, поэтому обычно берётся в группу.
+\end{itemize}
+Пример: @(?:red|green) light@ (без скобок @red|green light@ значит «red» или «green light»).
+Группы нумеруются по \textbf{открывающей} скобке слева направо, @res[0]@ — всё совпадение.
+\end{opr}
+
+\begin{opr}
+\term{Просмотр вперёд и назад} (lookaround) — проверка контекста, который не входит в результат:
+\begin{itemize}
+\item @(?=string)@ — дальше должно быть @string@;
+\item @(?!string)@ — дальше @string@ быть не должно;
+\item @(?<=string)@, @(?<!string)@ — то же, но назад (в @std::regex@ не поддерживается).
+\end{itemize}
+\end{opr}
+
+\textbf{Пример.} Шаблон @best(?= match)@ на строке «best match» даёт @res[0]@ $=$ «best»: «match» проверили, но в результат не взяли.
+
+\begin{opr}
+\term{Обратная ссылка} (backreference) @\num@ — ссылка на группу захвата с номером @num@: ровно тот же текст, который она захватила.
+\end{opr}
+
+\textbf{Пример.} Шаблон @(red|green) apple is \1@ подойдёт к «red apple is red» и «green apple is green», но не к «green apple is red».
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{0.24\linewidth}p{0.32\linewidth}p{0.32\linewidth}}
+\toprule
+{\hfont\color{kviolet}Задача} & {\hfont\color{kviolet}Шаблон} & {\hfont\color{kviolet}Замечание}\\
+\midrule
+Файл-картинка & @.*\.(jpg|png|gif)@ & точка экранирована\\
+Дата ДД-ММ-ГГГГ & @\d{2}-\d{2}-\d{4}@ & то же, что @[0-9]{2}-@\ldots\\
+HEX-цвет & @#[A-Fa-f0-9]{6}@ & не забыть строчные @a-f@\\
+\bottomrule
+\end{tabular}
+\caption{Практические шаблоны}
+\end{table}
+
+\begin{kob}{Частые ошибки}
+\begin{itemize}
+\item путать @match@ (вся строка) и @search@ (подстрока);
+\item забывать удваивать @\@ в обычных строках C++;
+\item ждать от @{,n}@ смысла «до $n$»;
+\item не брать @|@ в скобки: @red|green light@ $\ne$ @(?:red|green) light@.
+\end{itemize}
+\end{kob}
+
+\subsection{Лексический анализ на практике}
+
+Токены образуют регулярный язык $\Rightarrow$ лексический анализатор строится как конечный автомат (обычно через рекурсивные функции).
+
+\begin{kvb}{Требования к лексическому анализатору}
+\begin{enumerate}
+\item время работы $O(n)$, где $n$ — длина входного текста;
+\item реализация через конечный автомат;
+\item поиск ключевых слов по бору, а не перебором списка.
+\end{enumerate}
+\end{kvb}
+
+\textbf{Типы токенов:}
+\begin{enumerate}
+\item ключевые слова (key words);
+\item операторы (operator);
+\item литералы (literal);
+\item идентификаторы, т.\,е. имена переменных (id);
+\item разделители (delimiter, опционально);
+\item неизвестные символы (unknown).
+\end{enumerate}
+
+\subsection{Форма Бэкуса–Наура (BNF)}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{ll}
+\toprule
+{\hfont\color{kviolet}Обычная запись} & {\hfont\color{kviolet}BNF}\\
+\midrule
+$\rul$ & $::=$\\
+$S$ & $\langle S\rangle$\\
+$S\rul A\mid AB$ & $\langle S\rangle::=A[B]$\\
+$S\rul\alpha B',\ B'\rul\beta B'\mid\varepsilon$ & $\langle S\rangle::=\alpha\{\beta\}$\\
+\bottomrule
+\end{tabular}
+\caption{Обычная запись правил и BNF}
+\end{table}
+
+Квадратные скобки — \term{необязательная часть}, фигурные — \term{повторение} (ноль и более раз). Обычно $\varepsilon$ в BNF не используют.
+
+% ===================== 8 =====================
+\section{Синтаксический анализ}
+
+\subsection{Пример и классификация алгоритмов}
+
+\begin{lstlisting}
+if (a > b)
+    a = a - b;
+\end{lstlisting}
+\[
+\Downarrow\ \text{лексический анализатор}
+\]
+\begin{center}
+\tok{if}\ \tok{(}\ \tok{a}\ \tok{>}\ \tok{b}\ \tok{)}\ \tok{a}\ \tok{=}\ \tok{a}\ \tok{-}\ \tok{b}\ \tok{;}
+\end{center}
+\[
+\Downarrow\ \text{синтаксический анализатор}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={draw=kviolet,fill=kviolet!7,line width=0.9pt,rounded corners=2pt,font=\ttfamily,
+    minimum height=6mm,minimum width=8mm,inner sep=2.5pt,l sep=6mm,s sep=7mm,edge={line width=0.8pt}},
+  [if,draw=korange,fill=korange!12
+    [>\vphantom{p} [a] [b]]
+    [{=} [a] [{-}\vphantom{p} [a] [b]]]
+    [nullptr,draw=kgray,fill=white,dashed]]
+\end{forest}
+\caption{Синтаксическое дерево: условие, тело и пустая ветка \texttt{else}}
+\end{figure}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Универсальные алгоритмы:}
+\begin{enumerate}
+\item КЯК (Кока–Янгера–Касами): $O(n^3)$, $n$ — длина ввода;
+\item алгоритм Эрли: $O(n^3)$.
+\end{enumerate}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Неуниверсальные алгоритмы:}
+\begin{enumerate}
+\item $LL$-анализ (рекурсивный спуск);
+\item $LR$-анализ.
+\end{enumerate}
+\end{minipage}
+
+\subsection{Рекурсивный спуск}
+
+\textbf{Пример.}
+\[
+\begin{array}{l}
+\langle S\rangle::=\langle E\rangle\,\$\\
+\langle E\rangle::=\langle T\rangle\ \{+\ \langle T\rangle\}\\
+\langle T\rangle::=\langle F\rangle\ \{*\ \langle F\rangle\}\\
+\langle F\rangle::=\langle Num\rangle\mid(\langle E\rangle)
+\end{array}
+\]
+Разбираем строку: $5+7*(4+3*5)\$$.
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={font=\small,inner sep=1.5pt,l sep=3.5mm,s sep=2.5mm,edge={line width=0.7pt,kgray}},
+  where n children=0{tier=word,text=korange,font=\ttfamily\bfseries}{text=kviolet,font=\small\bfseries},
+  [S
+    [E
+      [T [F [5]]]
+      [+]
+      [T
+        [F [7]]
+        [*]
+        [F
+          [(]
+          [E
+            [T [F [4]]]
+            [+]
+            [T [F [3]] [*] [F [5]]]]
+          [)]]]]
+    [\$]]
+\end{forest}
+\hspace{1.2cm}
+\begin{forest}
+  for tree={circle,draw=korange,fill=korange!10,line width=0.9pt,minimum size=6.5mm,inner sep=0pt,font=\small,
+    l sep=4mm,s sep=4mm,edge={line width=0.8pt}},
+  where n children=0{draw=kviolet,fill=kviolet!7}{},
+  [$+$ [$5$] [$*$ [$7$] [$+$ [$4$] [$*$ [$3$] [$5$]]]]]
+\end{forest}
+\caption{Дерево разбора строки $5+7*(4+3*5)\$$ (слева) и получаемое синтаксическое дерево (справа)}
+\end{figure}
+
+\textbf{Как писать.} $t$ — текущий токен, @gt()@ — взять следующий токен.
+
+\textbf{Проверка:}
+\begin{lstlisting}
+void S() {
+    E();
+    if (t != '$') {
+        throw false;
+    }
+    gt();
+}
+
+void E() {
+    T();
+    while (t == '+') {
+        gt();
+        T();
+    }
+}
+
+void T() {
+    F();
+    while (t == '*') {
+        gt();
+        F();
+    }
+}
+
+void F() {
+    if (t == '(') {
+        gt();
+        E();
+        if (t != ')') {
+            throw false;
+        }
+        gt();
+        return;
+    }
+    if (t.type == "num") {
+        gt();
+        return;
+    }
+    throw false;
+}
+\end{lstlisting}
+
+\textbf{Построение:}
+\begin{lstlisting}
+Node* E() {
+    // операция + левоассоциативна
+    Node* left = T();
+    while (t == '+') {
+        gt();
+        Node* tmp = new Node('+');
+        tmp->left = left;
+        tmp->right = T();
+        left = tmp;
+    }
+    return left;
+}
+\end{lstlisting}
+
+\textbf{Для присваивания (правоассоциативный оператор):}
+\[
+\langle A\rangle::=\langle I\rangle\mid\langle I\rangle=\langle A\rangle
+\]
+\begin{lstlisting}
+Node* A() {
+    Node* left = I();
+    if (t == '=') {
+        gt();
+        Node* tmp = new Node('=');
+        tmp->left = left;
+        tmp->right = A();
+        left = tmp;
+    }
+    return left;
+}
+\end{lstlisting}
+
+\subsection{Применимость рекурсивного спуска}
+
+\begin{opr}
+$\operatorname{First}(\alpha)$ — множество терминалов, с которых может начинаться $\alpha$, $\alpha\in(T\cup N)^*$.
+\end{opr}
+
+\textbf{Пример.}
+\[
+\begin{array}{l}
+S\rul aA\mid BS\\ A\rul bB\mid cB\mid\varepsilon\\ B\rul aA\mid e
+\end{array}
+\qquad
+\operatorname{First}(ABb)=\{b,c,a,e\},\quad\operatorname{First}(\varepsilon)=\varnothing.
+\]
+
+\begin{opr}
+$\operatorname{Follow}(A)$ — множество терминалов, которые могут следовать за $A$, $A\in N$.
+\end{opr}
+
+\textbf{Пример.}
+\[
+\begin{array}{l}
+S\rul AaS\mid Ab\\ A\rul aA\mid\varepsilon
+\end{array}
+\qquad
+\operatorname{Follow}(A)=\{a,b\}.
+\]
+
+\begin{kvb}{$\operatorname{First}$ для нетерминалов $\operatorname{First}(A)$}
+\begin{enumerate}
+\item $A\rul a\alpha\Rightarrow$ добавляем $a$;
+\item $A\rul B\alpha\Rightarrow$ добавляем $\operatorname{First}(B)$. Если $B\Rightarrow^*\varepsilon$, добавляем $\operatorname{First}(\alpha)$.
+\end{enumerate}
+\end{kvb}
+
+\begin{kvb}{$\operatorname{First}$ для цепочек $\operatorname{First}(\alpha)$}
+\begin{enumerate}
+\item $\alpha=a\beta\Rightarrow\{a\}$;
+\item $\alpha=A\beta\Rightarrow\operatorname{First}(A)$. Если $A\Rightarrow^*\varepsilon$, то $\operatorname{First}(A)\cup\operatorname{First}(\beta)$.
+\end{enumerate}
+\end{kvb}
+
+\begin{kvb}{$\operatorname{Follow}(A)$}
+\begin{enumerate}
+\item $B\rul\xi A\alpha\Rightarrow$ добавляем $\operatorname{First}(\alpha)$;
+\item $B\rul\xi A\Rightarrow$ добавляем $\operatorname{Follow}(B)$;
+\item $B\rul\xi A\alpha$ и $\alpha\Rightarrow^*\varepsilon\Rightarrow$ добавляем $\operatorname{Follow}(B)$.
+\end{enumerate}
+\end{kvb}
+
+\textbf{Пример.}
+\[
+\begin{array}{l}
+S\rul aA\mid BDc\\ A\rul BAa\mid aB\mid b\\ B\rul\varepsilon\\ D\rul B\mid b
+\end{array}
+\qquad
+\begin{array}{ll}
+\operatorname{First}(B)=\varnothing, & \operatorname{Follow}(S)=\varnothing,\\
+\operatorname{First}(D)=\{b\}, & \operatorname{Follow}(A)=\{a\},\\
+\operatorname{First}(S)=\{a,b,c\}, & \operatorname{Follow}(B)=\{a,b,c\},\\
+\operatorname{First}(A)=\{a,b\}, & \operatorname{Follow}(D)=\{c\}.
+\end{array}
+\]
+
+\begin{kob}{Критерии применимости рекурсивного спуска}
+Раскрываем $A$: $\alpha A\beta$ (нужно раскрытие единственным образом).
+\begin{enumerate}
+\item $A\rul\alpha\mid\beta$: \quad $\operatorname{First}(\alpha)\cap\operatorname{First}(\beta)=\varnothing$;
+\item $A\Rightarrow^*\varepsilon$ и $A\rul\alpha_1\mid\dots\mid\alpha_n$: \quad $\exists!\,i:\ \alpha_i\Rightarrow^*\varepsilon$;
+\item $A\Rightarrow^*\varepsilon$: \quad $\operatorname{First}(A)\cap\operatorname{Follow}(A)=\varnothing$.
+\end{enumerate}
+\end{kob}
+
+\end{document}
