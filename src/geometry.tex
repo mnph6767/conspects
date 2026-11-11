@@ -1104,4 +1104,48 @@ V=\frac13h\bigl(S_1+\sqrt{S_1S_2}+S_2\bigr).
 \]
 \end{fbx}
 
+\subsection{Отношение объёмов тетраэдров с общим трёхгранным углом}
+
+\sidefig[0.36]{
+Пусть $SABC$ — тетраэдр, точки $P$, $Q$, $R$ лежат на рёбрах $SA$, $SB$, $SC$ соответственно, причём
+\[
+\frac{SP}{SA}=p,\qquad\frac{SQ}{SB}=q,\qquad\frac{SR}{SC}=r.
+\]
+Найдём отношение объёмов $\dfrac{V_{SPQR}}{V_{SABC}}$.
+}{
+\begin{tikzpicture}[scale=1.05]
+  \coordinate (S) at (1.5,3.4); \coordinate (A) at (0,0); \coordinate (B) at (1.4,0.9); \coordinate (C) at (3.2,0.05);
+  \coordinate (P) at ($(S)!0.55!(A)$); \coordinate (Q) at ($(S)!0.45!(B)$); \coordinate (R) at ($(S)!0.6!(C)$);
+  \fill[korange!18] (S) -- (P) -- (R) -- cycle;
+  \draw[line width=0.9pt] (S) -- (A) -- (C) -- cycle;
+  \draw[kgray,dashed] (S) -- (B) (A) -- (B) -- (C);
+  \draw[korange,line width=1.1pt] (P) -- (R);
+  \draw[korange,dashed,line width=0.9pt] (P) -- (Q) -- (R);
+  \foreach \p/\d in {S/above,A/below left,B/below,C/below right} \fill (\p) circle (1.4pt) node[\d] {$\p$};
+  \foreach \p/\d in {P/left,Q/above left,R/right} \fill[korange] (\p) circle (1.6pt) node[\d,korange] {$\p$};
+\end{tikzpicture}}
+
+Введём векторы $\ov{SA}$, $\ov{SB}$, $\ov{SC}$ и $\ov{SP}$, $\ov{SQ}$, $\ov{SR}$. Так как точки лежат на рёбрах,
+\[
+\ov{SP}=p\,\ov{SA},\qquad\ov{SQ}=q\,\ov{SB},\qquad\ov{SR}=r\,\ov{SC}.
+\]
+По геометрическому смыслу смешанного произведения
+\[
+V_{SABC}=\frac16\bigl|(\ov{SA},\ov{SB},\ov{SC})\bigr|,
+\]
+\[
+V_{SPQR}=\frac16\bigl|(\ov{SP},\ov{SQ},\ov{SR})\bigr|=\frac16\bigl|(p\,\ov{SA},q\,\ov{SB},r\,\ov{SC})\bigr|
+=\frac{pqr}6\bigl|(\ov{SA},\ov{SB},\ov{SC})\bigr|=pqr\cdot V_{SABC}.
+\]
+
+\begin{fbx}{Свойство деления объёма тетраэдра}
+\[
+\frac{V_{SPQR}}{V_{SABC}}=pqr=\frac{SP}{SA}\cdot\frac{SQ}{SB}\cdot\frac{SR}{SC}.
+\]
+\end{fbx}
+
+\begin{zam}
+Отношение объёмов тетраэдров с общим трёхгранным углом при вершине $S$ равно произведению отношений рёбер, выходящих из этой вершины.
+\end{zam}
+
 \end{document}
