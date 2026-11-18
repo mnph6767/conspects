@@ -932,6 +932,14 @@ E=\frac{m\dot x^2}2+\frac{kx^2}2=\const\quad\Longleftrightarrow\quad\dot x^2+\fr
 Подставляя $x=A\sin\omega t$: $(A\omega)^2\cos^2\omega t+\dfrac kmA^2\sin^2\omega t=\const$. Это выполняется при всех $t$ только если
 $\omega^2=\dfrac km$, — снова $T=2\pi\sqrt{m/k}$.
 
+\begin{kob}{Уравнения гармонических колебаний}
+Любая система, совершающая гармонические колебания с циклической частотой $\omega$, описывается уравнениями
+\[
+\text{силовое:}\quad\ddot x+\omega^2x=0,\qquad\qquad\text{энергетическое:}\quad\dot x^2+\omega^2x^2=\const.
+\]
+Чтобы найти частоту колебаний новой системы, достаточно привести её уравнение к одному из этих видов.
+\end{kob}
+
 \section{Электромагнитные колебания}
 
 \subsection{Колебательный контур}
@@ -963,12 +971,21 @@ I=\dot q=-q_0\omega\sin(\omega t+\varphi),\qquad I_0=\omega q_0\ \text{— ам�
 \]
 Заряд меняется по косинусу, ток — по синусу: когда заряд максимален, ток равен нулю, и наоборот.
 
+Если отсчитывать время так, что $q=q_0\sin\omega t$, то
+\[
+I=\dot q=\omega q_0\cos\omega t=\frac{q_0}{\sqrt{LC}}\cos\omega t,\qquad
+U_L=-L\dot I=L\,\omega^2q_0\sin\omega t=\frac{q_0}C\sin\omega t=U_C.
+\]
+
 \subsection{Энергия в колебательном контуре}
 \[
 \kbox{W=W_C+W_L=\frac{q^2}{2C}+\frac{LI^2}2=\const,\qquad W=\frac{q_0^2}{2C}=\frac{CU_0^2}2=\frac{LI_0^2}2.}
 \]
 Энергия электрического поля конденсатора периодически переходит в энергию магнитного поля катушки и обратно; максимальная энергия
-конденсатора равна максимальной энергии катушки: $W_{C\max}=W_{L\max}$.
+конденсатора равна максимальной энергии катушки: $W_{C\max}=W_{L\max}$. Отсюда амплитуда тока:
+\[
+\frac{LI_{\max}^2}2=\frac{q_0^2}{2C}\quad\Longrightarrow\quad\kbox{I_{\max}=\frac{q_0}{\sqrt{LC}}}
+\]
 
 \subsection{Аналогия механических и электромагнитных колебаний}
 
@@ -986,9 +1003,152 @@ I=\dot q=-q_0\omega\sin(\omega t+\varphi),\qquad I_0=\omega q_0\ \text{— ам�
 $\ddot x+\dfrac kmx=0$ & $\ddot q+\dfrac1{LC}q=0$\\
 $T=2\pi\sqrt{m/k}$ & $T=2\pi\sqrt{LC}$\\
 $\dfrac{mv^2}2+\dfrac{kx^2}2=\const$ & $\dfrac{LI^2}2+\dfrac{q^2}{2C}=\const$\\
+коэффициент сопротивления $\beta$ & сопротивление $R$\\
 \bottomrule
 \end{tabular}
 \caption{Соответствие величин}
 \end{table}
+
+\subsection{Затухающие колебания в контуре}
+В реальном контуре есть сопротивление $R$, на котором выделяется теплота, поэтому энергия колебаний постепенно уменьшается.
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[line width=0.8pt]
+  \draw (0,0) to[R,l_=$R$] (0,2.4) -- (0.6,2.4) to[L,l=$L$] (3.2,2.4) -- (3.2,0) to[C,l_=$C$] (0,0);
+  \draw[->,korange,line width=1pt] (3.5,1.6) -- (3.5,0.9) node[right,korange] {$I$};
+  \node[below,font=\small] at (1.6,-0.45) {$q_0$};
+\end{circuitikz}
+\caption{Колебательный контур с сопротивлением (RLC-контур)}
+\end{figure}
+
+По правилу Кирхгофа напряжение на конденсаторе равно сумме напряжений на резисторе и катушке:
+\[
+\frac qC=IR+L\dot I,\qquad I=-\dot q,\quad\dot I=-\ddot q\quad\Longrightarrow\quad\frac qC+\dot qR+\ddot qL=0.
+\]
+\[
+\kbox{\ddot q+\frac RL\,\dot q+\frac1{LC}\,q=0}
+\]
+Слагаемое $\dfrac RL\dot q$ отвечает за \term{затухание}. Решение (при малом затухании):
+\[
+\kbox{q=A_0e^{-\gamma t}\sin\omega t,\qquad\gamma=\frac R{2L},\qquad\omega\approx\frac1{\sqrt{LC}}}
+\]
+Множитель $A_0e^{-\gamma t}$ — \term{огибающая} (амплитуда колебаний), она экспоненциально убывает; $\gamma=\gamma(R)$ — \term{коэффициент затухания}.
+Период колебаний при этом остаётся постоянным: $T=\const$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=1.0]
+  \draw[axis] (0,0) -- (10,0) node[below] {$t$};
+  \draw[axis] (0,-2.2) -- (0,2.4) node[left] {$q$};
+  \draw[korange,dashed,line width=1pt,domain=0:9.6,samples=80] plot (\x,{2*exp(-0.25*\x)});
+  \draw[korange,dashed,line width=1pt,domain=0:9.6,samples=80] plot (\x,{-2*exp(-0.25*\x)});
+  \draw[kviolet,line width=1.4pt,domain=0:9.6,samples=300] plot (\x,{2*exp(-0.25*\x)*sin(\x*180/0.8)});
+  \node[korange,right,font=\small] at (2.2,1.5) {$A_0e^{-\gamma t}$ — огибающая};
+  \draw[<->,kviolet] (0.4,-1.95) -- (2.0,-1.95) node[midway,below,font=\small] {$T=\const$};
+\end{tikzpicture}
+\caption{Затухающие колебания заряда}
+\end{figure}
+
+\subsection{Затухание механических колебаний}
+\sidefig[0.36]{
+На груз пружинного маятника, кроме силы упругости $-kx$, действует сила сопротивления, пропорциональная скорости: $-\beta v=-\beta\dot x$.
+По второму закону Ньютона
+\[
+m\ddot x=-kx-\beta\dot x\quad\Longrightarrow\quad\kbox{m\ddot x+\beta\dot x+kx=0.}
+\]
+Уравнение имеет тот же вид, что и для RLC-контура: $m\leftrightarrow L$, $\beta\leftrightarrow R$, $k\leftrightarrow 1/C$.
+}{
+\begin{tikzpicture}
+  \fill[wall] (-0.25,0) rectangle (0,1.2); \draw[line width=0.8pt] (0,0) -- (0,1.2);
+  \fill[wall] (0,-0.22) rectangle (4.6,0); \draw[line width=0.8pt] (0,0) -- (4.6,0);
+  \draw[kviolet,line width=1pt,decorate,decoration={coil,aspect=0.5,segment length=4pt,amplitude=5pt}] (0,0.45) -- (2.2,0.45);
+  \draw[line width=1pt,fill=korange!20] (2.2,0) rectangle (3.2,0.9); \node at (2.7,0.45) {$m$};
+  \draw[veco] (2.2,0.7) -- (1.5,0.7) node[above,korange,font=\footnotesize] {$kx$};
+  \draw[vecv] (2.7,0.9) -- (2.0,1.35) node[above,kviolet,font=\footnotesize] {$\beta v$};
+  \draw[->,line width=0.9pt] (3.3,0.45) -- (4.1,0.45) node[above,font=\footnotesize] {$\vec v$};
+  \draw[<->] (2.2,-0.5) -- (3.2,-0.5) node[midway,below,font=\footnotesize] {$x$};
+\end{tikzpicture}}
+
+\subsection{Мощность в цепи переменного тока. Действующие значения}
+Пренебрежём затуханием: $q=q_0\sin\omega t$, $I=q_0\omega\cos\omega t$. Мгновенная мощность, выделяющаяся на резисторе:
+\[
+P=I^2R=(q_0\omega)^2\cos^2(\omega t)\cdot R.
+\]
+Так как $\cos^2(\omega t)=\dfrac{1+\cos(2\omega t)}2$, мощность колеблется с периодом $T_P=\dfrac T2$ около среднего значения:
+\[
+\kbox{P_{\text{ср}}=\frac{(q_0\omega)^2}2R=\frac{P_0}2}
+\]
+где $P_0=(q_0\omega)^2R$ — максимальная мощность.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis] (0,0) -- (9.4,0) node[below] {$t$};
+  \draw[axis] (0,0) -- (0,2.7) node[left] {$P$};
+  \fill[korange!25,domain=0:9,samples=200] plot (\x,{2.2*cos(\x*90)^2}) -- (9,1.1) -- (0,1.1) -- cycle;
+  \draw[kviolet,line width=1.4pt,domain=0:9,samples=200] plot (\x,{2.2*cos(\x*90)^2});
+  \draw[korange,dashed,line width=1pt] (0,1.1) -- (9.1,1.1);
+  \node[left] at (0,2.2) {$P_0$}; \node[left] at (0,1.1) {$\dfrac{P_0}2$};
+  \draw[<->,kviolet] (2,-0.35) -- (4,-0.35) node[midway,below,font=\small] {$T_P=\dfrac T2$};
+\end{tikzpicture}
+\caption{Мгновенная и средняя мощность: заштрихованные «излишки» над средней линией заполняют «провалы» под ней}
+\end{figure}
+
+\begin{opr}[действующие значения]
+\term{Действующее (эффективное) значение} силы тока $I_{\text{эф}}$ — такая сила постоянного тока, при которой на резисторе выделяется
+та же средняя мощность, что и при данном переменном токе:
+\[
+P_{\text{ср}}=I_{\text{эф}}^2R=\frac{U_{\text{эф}}^2}R.
+\]
+\end{opr}
+
+Для $U=U_0\sin\omega t$: $P_{\text{ср}}=\dfrac12\cdot\dfrac{U_0^2}R=\dfrac12I_0^2R$, откуда
+\[
+\kbox{I_{\text{эф}}=\frac{I_0}{\sqrt2},\qquad U_{\text{эф}}=\frac{U_0}{\sqrt2}}
+\]
+
+\section{Трансформатор}
+
+\begin{opr}
+\term{Трансформатор} — устройство для повышения или понижения переменного напряжения. Состоит из замкнутого
+\term{сердечника} и двух обмоток: \term{первичной} (число витков $N_1$, подключается к источнику $\sim U_1$) и \term{вторичной}
+(число витков $N_2$, к ней подключается нагрузка, напряжение $\sim U_2$).
+\end{opr}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.05]
+  \fill[kgray!25,even odd rule] (0,0) rectangle (4.4,3.4) (1.0,1.0) rectangle (3.4,2.4);
+  \draw[line width=1pt] (0,0) rectangle (4.4,3.4) (1.0,1.0) rectangle (3.4,2.4);
+  \draw[->,kviolet,line width=1pt,dashed] (2.2,2.9) -- (1.4,2.9);
+  \draw[->,kviolet,line width=1pt,dashed] (0.5,2.2) -- (0.5,1.4);
+  \draw[->,kviolet,line width=1pt,dashed] (2.2,0.5) -- (3.0,0.5);
+  \draw[->,kviolet,line width=1pt,dashed] (3.9,1.2) -- (3.9,2.0);
+  \node[kviolet,font=\small] at (2.2,3.12) {$\Phi$};
+  \foreach \y in {0.95,1.25,1.55,1.85,2.15,2.45} \draw[korange,line width=1.4pt] (3.25,\y) -- (4.55,\y+0.12);
+  \draw[korange,line width=1pt] (4.55,2.57) -- (5.4,2.57); \draw[korange,line width=1pt] (4.55,1.07) -- (5.4,1.07);
+  \node[right] at (5.45,1.82) {$\sim U_1$};
+  \node[korange,right,font=\small] at (4.6,2.05) {$N_1$};
+  \foreach \y in {1.25,1.6,1.95,2.3} \draw[kviolet,line width=1.4pt] (-0.15,\y) -- (1.15,\y+0.12);
+  \draw[kviolet,line width=1pt] (-0.15,2.3) -- (-1.0,2.3); \draw[kviolet,line width=1pt] (-0.15,1.25) -- (-1.0,1.25);
+  \node[left] at (-1.05,1.78) {$\sim U_2$};
+  \node[kviolet,left,font=\small] at (-0.2,2.0) {$N_2$};
+  \node[font=\footnotesize,align=center] at (2.2,-0.6) {сердечник};
+  \node[font=\footnotesize,korange,anchor=west] at (4.7,0.45) {первичная обмотка};
+  \node[font=\footnotesize,kviolet,anchor=east] at (-0.3,0.75) {вторичная обмотка};
+\end{tikzpicture}
+\caption{Устройство трансформатора}
+\end{figure}
+
+Переменный ток в первичной обмотке создаёт в сердечнике переменный магнитный поток $\Phi$, который пронизывает обе обмотки.
+В каждом витке возникает одна и та же ЭДС индукции $\Ei_{\text{инд}}=-\dot\Phi$, поэтому
+\[
+U_1=-\dot\Phi\cdot N_1,\qquad U_2=-\dot\Phi\cdot N_2.
+\]
+\[
+\kbox{\frac{U_1}{U_2}=\frac{N_1}{N_2}=k}
+\]
+где $k$ — \term{коэффициент трансформации}. При $k>1$ трансформатор понижающий, при $k<1$ — повышающий.
 
 \end{document}
