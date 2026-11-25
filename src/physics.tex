@@ -1108,7 +1108,31 @@ P_{\text{ср}}=I_{\text{эф}}^2R=\frac{U_{\text{эф}}^2}R.
 \kbox{I_{\text{эф}}=\frac{I_0}{\sqrt2},\qquad U_{\text{эф}}=\frac{U_0}{\sqrt2}}
 \]
 
-\section{Трансформатор}
+\section{Генератор и трансформатор}
+
+\subsection{Генератор и электромотор}
+
+\sidefig[0.42]{
+\term{Генератор} переменного тока — рамка (катушка), которая вращается в магнитном поле между полюсами магнита.
+При вращении магнитный поток $\Phi$ через рамку непрерывно меняется, и в ней возникает ЭДС индукции:
+\[
+\kbox{\Ei_{\text{инд}}=-\dot\Phi}
+\]
+Схема \akc{обратима}: если пропустить через рамку ток, сила Ампера начнёт её вращать — получится \term{электромотор}.
+}{
+\begin{tikzpicture}
+  \fill[korange!25] (0,0) rectangle (1.1,1.8); \draw[line width=1pt] (0,0) rectangle (1.1,1.8);
+  \fill[kviolet!20] (3.3,0) rectangle (4.4,1.8); \draw[line width=1pt] (3.3,0) rectangle (4.4,1.8);
+  \node[font=\hfont\large] at (0.55,0.9) {$S$};
+  \node[font=\hfont\large] at (3.85,0.9) {$N$};
+  \foreach \y in {0.4,0.9,1.4} \draw[->,kgray,line width=0.6pt] (3.3,\y) -- (1.1,\y);
+  \draw[kviolet,line width=1.6pt] (2.2,0.9) ellipse (0.35 and 0.7);
+  \draw[->,korange,line width=1pt] (1.55,-0.15) arc (200:340:0.7 and 0.3);
+  \node[korange,font=\small] at (2.2,-0.55) {$\omega$};
+  \node[kgray,font=\small] at (2.2,2.05) {$\vec B$};
+\end{tikzpicture}}
+
+\subsection{Трансформатор}
 
 \begin{opr}
 \term{Трансформатор} — устройство для повышения или понижения переменного напряжения. Состоит из замкнутого
@@ -1150,5 +1174,256 @@ U_1=-\dot\Phi\cdot N_1,\qquad U_2=-\dot\Phi\cdot N_2.
 \kbox{\frac{U_1}{U_2}=\frac{N_1}{N_2}=k}
 \]
 где $k$ — \term{коэффициент трансформации}. При $k>1$ трансформатор понижающий, при $k<1$ — повышающий.
+
+\subsection{Передача электроэнергии}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[draw=korange,fill=korange!12,line width=0.9pt,rounded corners=2pt,font=\small,align=center,minimum height=1.2cm] (G) at (0,0) {электро-\\станция};
+  \node[draw=kviolet,fill=kviolet!8,line width=0.9pt,rounded corners=2pt,font=\small,align=center,minimum height=1.2cm] (T1) at (3,0) {повышающий\\трансформатор};
+  \node[draw=kviolet,fill=kviolet!8,line width=0.9pt,rounded corners=2pt,font=\small,align=center,minimum height=1.2cm] (T2) at (10.4,0) {понижающий\\трансформатор};
+  \node[draw=korange,fill=korange!12,line width=0.9pt,rounded corners=2pt,font=\small,align=center,minimum height=1.2cm] (C) at (13.6,0) {потре-\\битель};
+  \draw[line width=1pt,->] (G) -- (T1);
+  \draw[line width=1.4pt,korange,->] (T1) -- node[above,font=\footnotesize] {ЛЭП: высокое $U$, малый $I$} node[below,font=\footnotesize,black] {потери $P=I^2R$} (T2);
+  \draw[line width=1pt,->] (T2) -- (C);
+\end{tikzpicture}
+\caption{Схема передачи электроэнергии}
+\end{figure}
+
+В проводах линии электропередачи (ЛЭП) сопротивлением $R$ теряется мощность $P_{\text{пот}}=I^2R$. Передаваемая мощность $P=UI$,
+поэтому при той же мощности повышение напряжения в $k$ раз уменьшает ток в $k$ раз, а потери — в $k^2$ раз. Для идеального трансформатора
+мощность сохраняется:
+\[
+\kbox{U_1I_1=U_2I_2\quad\Longrightarrow\quad\frac{I_1}{I_2}=\frac{U_2}{U_1}=\frac{N_2}{N_1}}
+\]
+Поэтому на электростанции напряжение \akc{повышают}, а перед потребителем \akc{понижают}.
+
+\section{Механические волны}
+
+\subsection{Основные понятия}
+
+\sidefig[0.36]{
+\term{Волна} — распространение колебаний в пространстве. Волна переносит энергию, но не вещество.
+\begin{itemize}
+\item $c$ — \term{скорость волны};
+\item $\lambda$ — \term{длина волны}: расстояние, которое волна проходит за один период.
+\end{itemize}
+}{
+\begin{tikzpicture}
+  \foreach \r in {1.0,1.6,2.2,2.8} \draw[kviolet,line width=1.2pt] ({\r*cos(-35)},{\r*sin(-35)}) arc (-35:35:\r);
+  \draw[vecv] (2.9,0) -- (3.7,0) node[right,kviolet] {$c$};
+  \draw[<->,korange] ({1.6*cos(-38)},{1.6*sin(-38)}) -- ({2.2*cos(-38)},{2.2*sin(-38)}) node[midway,below,korange] {$\lambda$};
+\end{tikzpicture}}
+
+\[
+\kbox{\nu=\frac1T=\frac c\lambda,\qquad\lambda=cT}
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[font=\hfont\small,kviolet] at (1.6,1.3) {продольная};
+  \draw[line width=0.9pt] (0,0) rectangle (3.2,0.8);
+  \foreach \x in {0.3,0.42,0.54,1.3,1.42,1.54,2.3,2.42,2.54} \draw[kviolet,line width=1pt] (\x,0.05) -- (\x,0.75);
+  \foreach \x in {0.9,1.9,2.9} \draw[kviolet!40,line width=0.6pt] (\x,0.05) -- (\x,0.75);
+  \draw[->,korange,line width=1pt] (3.4,0.4) -- (4.1,0.4) node[right,font=\small] {$c$};
+  \begin{scope}[xshift=6.3cm]
+  \node[font=\hfont\small,korange] at (1.6,1.3) {поперечная};
+  \draw[line width=0.9pt] (0,0) rectangle (3.2,0.8);
+  \draw[korange,line width=1.3pt,domain=0:3.2,samples=80] plot (\x,{0.4+0.28*sin(\x*225)});
+  \draw[->,korange,line width=1pt] (3.4,0.4) -- (4.1,0.4) node[right,font=\small] {$c$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Продольная и поперечная волны}
+\end{figure}
+
+Волны бывают \term{продольными} (частицы среды колеблются вдоль направления распространения) и \term{поперечными} (поперёк него).
+
+\subsection{Звук}
+\term{Звук} — продольная волна: чередующиеся уплотнения и разрежения воздуха. Скорость звука в газе порядка скорости теплового
+движения молекул:
+\[
+c_{\text{зв}}\approx\frac1{\sqrt2}\,v_{\text{мол}},\qquad v_{\text{мол}}=\sqrt{\frac{3kT}{m_0}}.
+\]
+
+\begin{fbx}{Скорости в воздухе}
+\[
+c_{\text{звука}}\approx330\ \text{м/с},\qquad c_{\text{света}}=3\cdot10^8\ \text{м/с}.
+\]
+Например, на расстояние $l=10$~км звук идёт $t_{\text{зв}}\approx30$~с, а свет — $t_{\text{св}}\approx0{,}00003$~с.
+\end{fbx}
+
+Человек слышит звук с частотой примерно от $20$~Гц до $20$~кГц, что в воздухе соответствует длинам волн примерно от $17$~м до $1{,}7$~см.
+
+\begin{zam}[Резонанс в трубе]
+Минимальная длина трубы, закрытой с одного конца, при которой в ней возникает резонанс: $L=\dfrac\lambda4$.
+\end{zam}
+
+\subsection{Преломление звука}
+
+\sidefig[0.36]{
+Скорость звука зависит от свойств воздуха (давления $p(h)$, температуры), которые меняются с высотой. Поэтому звуковой луч
+\term{преломляется} на границах слоёв и искривляется. Аналог показателя преломления:
+\[
+n=\frac{c_{\text{зв}}(0)}{c_{\text{зв}}(h)}.
+\]
+}{
+\begin{tikzpicture}
+  \foreach \y in {0.8,1.6,2.4,3.2} \draw[kgray,line width=0.6pt] (0,\y) -- (3.8,\y);
+  \fill[wall] (0,-0.2) rectangle (3.8,0); \draw[line width=0.8pt] (0,0) -- (3.8,0);
+  \draw[kviolet,line width=1.4pt] (0.3,3.4) .. controls (1.2,1.6) and (2.0,0.6) .. (3.0,0.05);
+  \draw[korange,dashed,line width=0.9pt] (0.3,3.4) -- (2.2,0.05);
+  \node[right,font=\small] at (3.85,2.8) {$p(h)$};
+\end{tikzpicture}}
+
+\subsection{Уравнение бегущей волны}
+\[
+\kbox{p=p_0\sin(kx-\omega t),\qquad k=\frac{2\pi}\lambda,\qquad\omega=\frac{2\pi}T}
+\]
+$k$ — \term{волновое число}: $k\lambda=2\pi$. С течением времени картина сдвигается вдоль оси $x$ со скоростью $c=\dfrac\omega k$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis] (0,0) -- (8.6,0) node[below] {$x$};
+  \draw[axis] (0,-1.3) -- (0,1.5) node[left] {$p$};
+  \draw[kviolet,line width=1.3pt,domain=0:8.2,samples=150] plot (\x,{sin(\x*90)});
+  \draw[korange,line width=1.1pt,dashed,domain=0:8.2,samples=150] plot (\x,{sin(\x*90-60)});
+  \draw[<->,kviolet] (1,1.25) -- (5,1.25) node[midway,above] {$\lambda$};
+  \draw[->,korange,line width=1pt] (6.2,-1.15) -- (7.2,-1.15) node[right,font=\small] {$c$};
+\end{tikzpicture}
+\caption{Бегущая волна в два момента времени}
+\end{figure}
+
+\subsection{Стоячие волны}
+Сложим две волны, бегущие навстречу друг другу (например, падающую и отражённую):
+\[
+p=p_0\sin(kx-\omega t)+p_0\sin(kx+\omega t+\varphi_0)=2p_0\sin\Bigl(kx+\frac{\varphi_0}2\Bigr)\cos\Bigl(\omega t+\frac{\varphi_0}2\Bigr).
+\]
+Получается \term{стоячая волна}: каждая точка колеблется с амплитудой $2p_0\bigl|\sin(kx+\varphi_0/2)\bigr|$, которая зависит от $x$.
+Точки, где амплитуда равна нулю, — \term{узлы}; они не смещаются. Между соседними узлами — $\lambda/2$. Стоячие волны возникают
+при \term{резонансе}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \draw[axis] (0,0) -- (8.6,0) node[below] {$x$};
+  \draw[axis] (0,-1.5) -- (0,1.6) node[left] {$p$};
+  \foreach \a/\c in {1/kviolet,0.55/kviolet!60,-0.55/korange!70,-1/korange} \draw[\c,line width=1.2pt,domain=0:8,samples=120] plot (\x,{\a*1.2*sin(\x*90)});
+  \foreach \x in {2,4,6} \fill[korange!40] (\x,0) circle (0.14);
+  \draw[korange,line width=0.6pt] (4,-0.15) -- (4.6,-0.75) node[right,font=\small] {узел};
+  \draw[<->,kviolet] (2,-1.4) -- (4,-1.4) node[midway,below,font=\small] {$\lambda/2$};
+\end{tikzpicture}
+\caption{Стоячая волна в разные моменты времени}
+\end{figure}
+
+\subsection{Эффект Доплера}
+Пусть источник с собственной частотой $\nu_0=1/T$ движется со скоростью $v$, а звук распространяется со скоростью $c$.
+За период $T$ волна уходит на $cT$, а источник смещается на $vT$, поэтому длина волны меняется:
+\begin{itemize}
+\item \textbf{впереди} источника: $\lambda_1=cT-vT=(c-v)T$;
+\item \textbf{позади} источника: $\lambda_2=cT+vT=(c+v)T$.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \foreach \i in {0,1,2,3} {
+    \pgfmathsetmacro{\r}{0.55*(4-\i)}
+    \pgfmathsetmacro{\cx}{0.45*\i}
+    \draw[kviolet,line width=1pt] (\cx,0) circle (\r);
+    \fill[kviolet] (\cx,0) circle (1.3pt);
+  }
+  \fill[korange] (1.8,0) circle (2.5pt);
+  \draw[vecv,korange] (1.8,0) -- (2.6,0) node[above,korange] {$v$};
+  \node[font=\small] at (3.9,0.9) {$\lambda_1$ меньше};
+  \node[font=\small] at (-3.3,0.9) {$\lambda_2$ больше};
+\end{tikzpicture}
+\caption{Волновые фронты движущегося источника}
+\end{figure}
+
+\begin{fbx}{Частота, которую слышит неподвижный наблюдатель}
+\[
+\text{источник приближается:}\quad\nu_1=\nu_0\,\frac c{c-v},\qquad\qquad
+\text{источник удаляется:}\quad\nu_2=\nu_0\,\frac c{c+v}.
+\]
+\end{fbx}
+
+Если $v=c$, то $\nu_1\to\infty$, $\lambda_1\to0$: волны «сжимаются в точку». Для звука это слышно как резкий хлопок.
+
+\subsection{Конус Маха}
+
+\sidefig[0.4]{
+Если источник движется быстрее волны ($v>c$), фронты от всех его прошлых положений образуют \term{конус Маха}. За время $T$
+источник проходит $vT$, а фронт — $cT$, поэтому угол полураствора конуса
+\[
+\kbox{\sin\alpha=\frac{cT}{vT}=\frac cv.}
+\]
+}{
+\begin{tikzpicture}[scale=0.9]
+  \coordinate (P) at (4,0);
+  \foreach \x/\r in {0/1.85,1/1.39,2/0.92,3/0.46} {\draw[kviolet,line width=0.9pt] (\x,0) circle (\r); \fill[kviolet] (\x,0) circle (1.2pt);}
+  \draw[korange,line width=1.3pt] (P) -- (-0.6,2.40) (P) -- (-0.6,-2.40);
+  \fill[korange] (P) circle (2.5pt);
+  \draw[->,korange,line width=1pt] (4.1,0) -- (5,0) node[right] {$v$};
+  \draw[aux] (0,0) -- (P);
+  \draw (3.2,0) arc (180:155:0.8); \node[font=\footnotesize] at (2.9,0.17) {$\alpha$};
+\end{tikzpicture}}
+
+\subsection{Красное смещение}
+Большинство звёзд и галактик удаляется от Земли. По эффекту Доплера длина волны их излучения \akc{увеличивается}, и спектр
+смещается к красному краю — это \term{красное смещение}.
+
+\section{Электромагнитные волны}
+
+\subsection{Шкала электромагнитных волн}
+Все электромагнитные волны распространяются в вакууме со скоростью $c=3\cdot10^8$~м/с; частота $\nu=c/\lambda$.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{lll}
+\toprule
+{\hfont\color{kviolet}Вид излучения} & {\hfont\color{kviolet}Длина волны $\lambda$} & {\hfont\color{kviolet}Частота $\nu$, Гц}\\
+\midrule
+Низкочастотные волны & $\geqslant10^4$ м & $\leqslant3\cdot10^4$\\
+Радиоволны & $10^4$ — $10^{-4}$ м & $3\cdot10^4$ — $3\cdot10^{12}$\\
+Инфракрасное излучение & $10^{-4}$ — $8\cdot10^{-7}$ м & $3\cdot10^{12}$ — $3{,}75\cdot10^{14}$\\
+Видимый свет & $800$ — $400$ нм & $3{,}75\cdot10^{14}$ — $7{,}5\cdot10^{14}$\\
+Ультрафиолетовое излучение & $4\cdot10^{-7}$ — $10^{-8}$ м & $7{,}5\cdot10^{14}$ — $3\cdot10^{16}$\\
+Рентгеновское излучение & $10^{-8}$ — $10^{-11}$ м & $3\cdot10^{16}$ — $3\cdot10^{19}$\\
+Гамма-излучение & $10^{-11}$ — $10^{-13}$ м & $3\cdot10^{19}$ — $3\cdot10^{21}$\\
+\bottomrule
+\end{tabular}
+\caption{Шкала электромагнитных волн}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \shade[left color=kviolet!15,right color=korange!45] (0,0) rectangle (14,0.7);
+  \draw[line width=0.8pt] (0,0) rectangle (14,0.7);
+  \foreach \x/\l in {2.0/радио,4.6/ИК,6.4/,7.7/УФ,10/рентген,12.6/гамма} \node[font=\footnotesize] at (\x,0.35) {\l};
+  \fill[red!70] (5.9,0) rectangle (6.15,0.7); \fill[yellow!80!orange] (6.15,0) rectangle (6.4,0.7);
+  \fill[green!60!black] (6.4,0) rectangle (6.65,0.7); \fill[blue!70] (6.65,0) rectangle (6.9,0.7);
+  \draw[->,line width=0.8pt] (0,-0.35) -- (14,-0.35) node[below left,font=\footnotesize] {$\nu$ растёт, $\lambda$ уменьшается};
+  \node[above,font=\footnotesize] at (6.4,0.7) {видимый свет};
+\end{tikzpicture}
+\caption{Электромагнитный спектр}
+\end{figure}
+
+Диапазон видимого света \akc{очень узкий} по сравнению со всей шкалой.
+
+\subsection{Почему опасно гамма-излучение}
+Энергия кванта излучения пропорциональна частоте:
+\[
+\kbox{E=h\nu}
+\]
+У гамма-излучения частота очень велика, значит, велика и энергия квантов. Такие кванты, попадая в живые клетки, разрушают их.
+
+\subsection{Почему волны проходят не через все вещества}
+Электроны вещества имеют собственные частоты колебаний. Если частота волны совпадает с собственной частотой, электроны вступают
+в \term{резонанс} и поглощают энергию волны — волна через вещество не проходит.
 
 \end{document}
