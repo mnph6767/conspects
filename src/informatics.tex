@@ -878,7 +878,7 @@ Q_0\rul aQ_1\mid bQ_2\mid a\mid b\\ Q_1\rul bQ_4\mid a\mid b\\ Q_2\rul aQ_4\mid 
 
 Например, на строке @<b>x</b>@ шаблон @<.+>@ захватит всю строку, а @<.+?>@ — только @<b>@.
 
-\subsection{Группировки}
+\subsection{Группировки и примеры}
 
 \begin{opr}
 \term{Группировки} ставятся в круглые скобки:
@@ -1215,5 +1215,230 @@ S\rul aA\mid BDc\\ A\rul BAa\mid aB\mid b\\ B\rul\varepsilon\\ D\rul B\mid b
 \item $A\Rightarrow^*\varepsilon$: \quad $\operatorname{First}(A)\cap\operatorname{Follow}(A)=\varnothing$.
 \end{enumerate}
 \end{kob}
+
+\subsection{Пример построения дерева выражений}
+
+\textbf{Пример.} Выражения с $+$, $-$ и возведением в степень $\wedge$ (символ @^@), где $\langle N\rangle$ — число, $\langle I\rangle$ — идентификатор.
+\[
+\begin{array}{l}
+\langle E\rangle::=\langle T\rangle\ \{+\ \langle T\rangle\mid-\ \langle T\rangle\}\\
+\langle T\rangle::=\langle F\rangle\ [\,\wedge\ \langle T\rangle\,]\\
+\langle F\rangle::=\langle N\rangle\mid(\langle E\rangle)\mid\langle I\rangle
+\end{array}
+\]
+Узел дерева — @Node(token, {children})@: токен и список потомков.
+
+\begin{lstlisting}
+Node* E() {
+    Node* l = T();
+    while (t == '+' || t == '-') {
+        auto op = t;
+        gt();
+        l = new Node(op, {l, T()});
+    }
+    return l;
+}
+
+Node* T() {
+    Node* l = F();
+    if (t == '^') {
+        gt();
+        l = new Node('^', {l, T()});
+    }
+    return l;
+}
+
+Node* F() {
+    if (t == '(') {
+        gt();
+        Node* res = E();
+        if (t != ')') {
+            throw Error();
+        }
+        gt();
+        return res;
+    }
+    if (t.type == ID || t.type == NUM) {
+        Node* res = new Node(t);
+        gt();
+        return res;
+    }
+    throw Error();
+}
+\end{lstlisting}
+
+\begin{zam}
+\akc{Левая} ассоциативность ($+$, $-$) получается циклом @while@, \akc{правая} ($\wedge$) — рекурсивным вызовом @T()@ справа.
+\end{zam}
+
+\subsection{Деревья для операторов}
+
+\tikzset{astn/.style={draw=kviolet,fill=kviolet!7,line width=0.9pt,rounded corners=2pt,font=\ttfamily\small,
+    minimum height=6mm,minimum width=9mm,inner sep=2.5pt},
+  astk/.style={astn,draw=korange,fill=korange!12},
+  astl/.style={draw=none,fill=none,text=kgray,font=\ttfamily\footnotesize,inner sep=1pt,minimum width=0pt}}
+
+\begin{itemize}
+\item \textbf{if} — узел @IF@ с тремя потомками: условие, ветка @true@ и ветка @false@. Если ветки @else@ нет, третий потомок — @nullptr@.
+\item \textbf{for} — узел @FOR@ с четырьмя потомками: инициализация, условие, итерация, тело.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={astn,l sep=6mm,s sep=4mm,edge={line width=0.8pt}},
+  [IF,astk [cond,astl] [true-case,astl] [false-case,astl]]
+\end{forest}
+\hspace{1.5cm}
+\begin{forest}
+  for tree={astn,l sep=6mm,s sep=4mm,edge={line width=0.8pt}},
+  [FOR,astk [init,astl] [cond,astl] [iter,astl] [body,astl]]
+\end{forest}
+\caption{Узлы \texttt{IF} и \texttt{FOR}}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Тело (блок)} можно реализовать двумя способами:
+  \begin{enumerate}
+  \item один узел @BLOCK@ с произвольным числом потомков (по одному на оператор);
+  \item цепочка узлов @SEQ@: оператор и ссылка на остаток цепочки.
+  \end{enumerate}
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={astn,l sep=6mm,s sep=4mm,edge={line width=0.8pt}},
+  [BLOCK,astk [stmt,astl] [stmt,astl] [stmt,astl] [\dots,astl,no edge]]
+\end{forest}
+\hspace{1.5cm}
+\begin{forest}
+  for tree={astn,l sep=4mm,s sep=3mm,edge={line width=0.8pt}},
+  [BLOCK,astk [SEQ [stmt,astl] [SEQ [stmt,astl] [SEQ [stmt,astl] [\dots,astl]]]]]
+\end{forest}
+\caption{Тело: один узел \texttt{BLOCK} (слева) или цепочка \texttt{SEQ} (справа)}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Функция} — узел @FUNC@ с двумя потомками: заголовок @HEAD@ и тело @BLOCK@.
+\item \textbf{Программа} — узел @GLOBAL@, потомки — все функции (@FUNC@).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{forest}
+  for tree={astn,l sep=6mm,s sep=5mm,edge={line width=0.8pt}},
+  [FUNC,astk [HEAD] [BLOCK]]
+\end{forest}
+\hspace{1.5cm}
+\begin{forest}
+  for tree={astn,l sep=6mm,s sep=4mm,edge={line width=0.8pt}},
+  [GLOBAL,astk [FUNC] [FUNC] [\dots,astl,no edge] [FUNC]]
+\end{forest}
+\caption{Узлы \texttt{FUNC} и \texttt{GLOBAL}}
+\end{figure}
+
+\begin{kob}{Что должен выдавать синтаксический анализатор}
+\begin{enumerate}
+\item ответ на вопрос, есть ли синтаксические ошибки; если есть, то какая ошибка и в какой строке (поэтому токен должен хранить номер строки);
+\item небольшую визуализацию дерева (можно текстом).
+\end{enumerate}
+\end{kob}
+
+\subsection{Как преобразовать грамматику для рекурсивного спуска}
+
+\begin{kvb}{Проблемы}
+\begin{enumerate}
+\item левая рекурсия: $A\rul A\alpha\mid\beta$;
+\item общие начала: $A\rul a\alpha_1\mid a\alpha_2$;
+\item правило начинается с нетерминала: $A\rul B\gamma$;
+\item пустая альтернатива и конфликт: $\operatorname{First}(A)\cap\operatorname{Follow}(A)\ne\varnothing$.
+\end{enumerate}
+\end{kvb}
+
+\begin{kob}{Утверждение}
+Успех не гарантирован: существуют КС-языки, для которых эквивалентной грамматики, пригодной для рекурсивного спуска, не существует
+(некоторые лечения проблемы могут порождать другие проблемы).
+\end{kob}
+
+\subsubsection{1. Левая рекурсия}
+\[
+\text{Было:}\quad A\rul A\alpha_1\mid\dots\mid A\alpha_n\mid\beta_1\mid\dots\mid\beta_m
+\qquad\Longrightarrow\qquad
+\text{Стало:}\quad\begin{array}{l}A\rul\beta_1A'\mid\dots\mid\beta_mA'\\ A'\rul\alpha_1A'\mid\dots\mid\alpha_nA'\mid\varepsilon\end{array}
+\]
+
+\textbf{Пример.} Было: $A\rul Aa\mid Ab\mid c$. Стало: $A\rul cA'$, $A'\rul aA'\mid bA'\mid\varepsilon$.
+
+\begin{zam}
+В BNF то же самое записывается итерацией: $\langle A\rangle::=\beta\,\{\alpha\}$. Так устроены функции @E()@ и @T()@ выше:
+цикл @while@ заменяет левую рекурсию.
+\end{zam}
+
+\textbf{Косвенная левая рекурсия.}
+\[
+\begin{array}{l}S\rul Aa\mid b\\ A\rul Sc\mid d\end{array}
+\qquad S\Rightarrow Aa\Rightarrow Sca
+\]
+Лечение:
+\begin{enumerate}
+\item подстановка: $S\rul Sca\mid da\mid b$;
+\item устраняем прямую левую рекурсию: $S\rul daS'\mid bS'$, \ $S'\rul caS'\mid\varepsilon$.
+\end{enumerate}
+
+\subsubsection{2. Левая факторизация}
+Объединяем все альтернативы с общей частью в одну, а то, что идёт после неё, разбираем в отдельном нетерминале.
+\[
+\text{Было:}\quad A\rul a\alpha_1\mid a\alpha_2
+\qquad\Longrightarrow\qquad
+\text{Стало:}\quad\begin{array}{l}A\rul aA'\\ A'\rul\alpha_1\mid\alpha_2\end{array}
+\]
+
+\textbf{Пример.} Было: $S\rul\textbf{if}\ E\ \textbf{then}\ S\mid\textbf{if}\ E\ \textbf{then}\ S\ \textbf{else}\ S$. Стало:
+\[
+\begin{array}{l}S\rul\textbf{if}\ E\ \textbf{then}\ S\,S'\\ S'\rul\textbf{else}\ S\mid\varepsilon\end{array}
+\]
+Если общий префикс длиннее одного символа, выносим \akc{самый длинный}. Если после факторизации у $A'$ снова появились общие начала, повторяем.
+
+\subsubsection{3. Правило начинается с другого нетерминала}
+Раскрываем подстановкой: вместо нетерминала в начале альтернативы подставляем его правила. После этого общие начала становятся видны,
+и применяем левую факторизацию.
+
+\textbf{Пример.} Было: $A\rul Bx\mid Cy$, $B\rul ab\mid ac$, $C\rul d$.
+\begin{enumerate}
+\item подстановка: $A\rul abx\mid acx\mid Cy$;
+\item факторизация: $A\rul aA'\mid Cy$, \ $A'\rul bx\mid cx$.
+\end{enumerate}
+
+\subsubsection{4. Пустая альтернатива}
+Конфликт: $\operatorname{First}(A)\cap\operatorname{Follow}(A)\ne\varnothing$, то есть по текущему токену нельзя выбрать между непустой
+веткой и $\varepsilon$.
+
+\textbf{Лечение:} подставить $A$ во все правила, где он используется (тогда $\varepsilon$-ветка превращается в вариант «без $A$»),
+а затем провести левую факторизацию.
+
+\textbf{Пример.} $S\rul Aa$, \ $A\rul a\mid\varepsilon$. Здесь $\operatorname{First}(A)=\{a\}$ (и $A\Rightarrow^*\varepsilon$),
+$\operatorname{Follow}(A)=\{a\}$, значит, $a$ в пересечении, и это конфликт.
+\begin{enumerate}
+\item подстановка $A$ в $S$: $S\rul aa\mid a$;
+\item факторизация: $S\rul aS'$, \ $S'\rul a\mid\varepsilon$.
+\end{enumerate}
+Проверка: $\operatorname{First}(S')=\{a\}$, $\operatorname{Follow}(S')=\{\$\}$ ($\$$ — конец ввода). Пересечения нет, конфликт устранён.
+
+\begin{zam}
+Если подстановкой конфликт не снимается, возможны два варианта: грамматика неоднозначна (как «висящий else»), и тогда в коде
+договариваются о приоритете, выбирая непустую ветку; или грамматика не LL(1), и нужен больший предпросмотр.
+\end{zam}
+
+\textbf{Пример с несколькими шагами.} $B\rul bAa$, \ $A\rul aA\mid c\mid\varepsilon$. Здесь $\operatorname{First}(A)=\{a,c\}$,
+$A\Rightarrow^*\varepsilon$, $\operatorname{Follow}(A)=\{a\}$: на токене $a$ непонятно, брать $aA$ или $\varepsilon$.
+\begin{enumerate}
+\item подставляем $A$ в $B$: $B\rul baAa\mid bca\mid ba$;
+\item выносим общий префикс $b$: $B\rul bA'$, \ $A'\rul aAa\mid ca\mid a$;
+\item так как $A'=Aa$, то $aAa=aA'$, и $A$ больше не нужен: $A'\rul aA'\mid ca\mid a$;
+\item выносим префикс $a$: $B\rul bA'$, \ $A'\rul aC\mid ca$, \ $C\rul A'\mid\varepsilon$.
+\end{enumerate}
+Проверка: $\operatorname{First}(A')=\{a,c\}$, $\operatorname{Follow}(C)=\operatorname{Follow}(A')=\operatorname{Follow}(B)=\{\$\}$.
+Пересечения нет, альтернативы у $A'$ начинаются с разных терминалов — грамматика подходит для рекурсивного спуска.
 
 \end{document}
